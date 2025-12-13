@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STOOM – Choisir mon matériel</title>
+
+<style>
+:root{
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --border:#e4e8f0;
+  --main:#1f4fd8;
+  --text:#111;
+  --muted:#667;
+}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  background:var(--bg);
+  color:var(--text);
+}
+.wrap{
+  max-width:900px;
+  margin:24px auto;
+  padding:16px;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 6px 18px rgba(0,0,0,.06);
+}
+h1{margin:0 0 8px;}
+p{color:var(--muted);}
+
+.step{margin-top:20px;}
+.step h2{font-size:18px;margin-bottom:10px;}
+
+.options{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:10px;
+}
+button.opt{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:12px;
+  padding:12px;
+  text-align:left;
+  cursor:pointer;
+}
+button.opt.active{
+  border-color:var(--main);
+  outline:2px solid rgba(31,79,216,.15);
+}
+
+.btn{
+  margin-top:20px;
+  background:var(--main);
+  color:#fff;
+  border:none;
+  padding:14px;
+  width:100%;
+  border-radius:14px;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.result{
+  margin-top:24px;
+  border-top:1px solid var(--border);
+  padding-top:20px;
+}
+.badge{
+  display:inline-block;
+  padding:6px 10px;
+  background:#eef2ff;
+  border-radius:999px;
+  margin-right:6px;
+  font-size:13px;
+}
+.block{
+  background:#f8faff;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+  margin-top:12px;
+}
+strong{color:#000;}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+<div class="card">
+
+<h1>Choisir mon matériel de vape</h1>
+<p>Outil d’orientation STOOM – pour un matériel adapté à votre profil et éviter les erreurs.</p>
+
+<!-- STEP 1 -->
+<div class="step">
+<h2>1️⃣ Votre consommation</h2>
+<div class="options" id="cigarettes">
+  <button class="opt" data-value="low">– 10 cigarettes / jour</button>
+  <button class="opt" data-value="mid">10 à 15 cigarettes / jour</button>
+  <button class="opt" data-value="high">15 à 20 cigarettes / jour</button>
+  <button class="opt" data-value="veryhigh">20+ cigarettes / jour</button>
+</div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step">
+<h2>2️⃣ Ce que vous recherchez</h2>
+<div class="options" id="sensation">
+  <button class="opt" data-value="cig">Sensation proche de la cigarette</button>
+  <button class="opt" data-value="vapeur">Plus de vapeur</button>
+  <button class="opt" data-value="simple">Simple & discret</button>
+</div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step">
+<h2>3️⃣ Votre expérience</h2>
+<div class="options" id="experience">
+  <button class="opt" data-value="beginner">Débutant</button>
+  <button class="opt" data-value="intermediate">Déjà vapoté</button>
+  <button class="opt" data-value="advanced">Confirmé</button>
+</div>
+</div>
+
+<button class="btn" onclick="analyser()">Voir la recommandation STOOM</button>
+
+<div class="result" id="result" style="display:none;">
+  <h2>🔎 Recommandation STOOM</h2>
+
+  <div class="block">
+    <p><strong>Type de tirage :</strong> <span id="tirage"></span></p>
+    <p><strong>Puissance :</strong> <span id="puissance"></span></p>
+    <p><strong>Autonomie :</strong> <span id="autonomie"></span></p>
+  </div>
+
+  <div class="block">
+    <p><strong>Nicotine conseillée :</strong> <span id="nicotine"></span></p>
+    <p><strong>Pourquoi :</strong> <span id="explication"></span></p>
+  </div>
+
+  <div class="block">
+    <p><strong>⚠️ À éviter :</strong></p>
+    <ul id="eviter"></ul>
+  </div>
+
+  <p style="margin-top:12px;font-size:14px;color:var(--muted);">
+    💡 Conseil STOOM : le bon matériel est celui qui évite la frustration et la rechute, pas celui qui fait le plus de vapeur.
+  </p>
+</div>
+
+</div>
+</div>
+
+<script>
+function select(group,id){
+  document.querySelectorAll("#"+group+" .opt").forEach(b=>b.classList.remove("active"));
+  id.classList.add("active");
+}
+document.querySelectorAll(".opt").forEach(b=>{
+  b.onclick=()=>select(b.parentElement.id,b);
+});
+
+function analyser(){
+  const cig=document.querySelector("#cigarettes .active")?.dataset.value;
+  const sen=document.querySelector("#sensation .active")?.dataset.value;
+  const exp=document.querySelector("#experience .active")?.dataset.value;
+  if(!cig||!sen||!exp){alert("Merci de répondre à toutes les questions.");return;}
+
+  let tirage="Serré (MTL)";
+  let puissance="Faible";
+  let autonomie="Moyenne";
+  let nicotine="6 à 12 mg/ml";
+  let explication="Profil orienté sevrage progressif.";
+  let eviter=[];
+
+  if(cig==="veryhigh"){
+    nicotine="12 à 20 mg/ml (sels possibles)";
+    eviter.push("Matériel trop puissant","Inhalation directe");
+  }
+  if(sen==="vapeur"){
+    tirage="Semi-aérien (RDL)";
+    puissance="Modérée";
+    autonomie="Bonne";
+    eviter.push("Nicotine trop élevée");
+  }
+  if(exp==="beginner"){
+    eviter.push("Réglages complexes","Matériel trop volumineux");
+  }
+
+  document.getElementById("tirage").textContent=tirage;
+  document.getElementById("puissance").textContent=puissance;
+  document.getElementById("autonomie").textContent=autonomie;
+  document.getElementById("nicotine").textContent=nicotine;
+  document.getElementById("explication").textContent=explication;
+
+  const ul=document.getElementById("eviter");
+  ul.innerHTML="";
+  eviter.forEach(e=>{
+    const li=document.createElement("li");
+    li.textContent=e;
+    ul.appendChild(li);
+  });
+
+  document.getElementById("result").style.display="block";
+}
+</script>
+</body>
+</html>
