@@ -1,217 +1,963 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>STOOM – Choisir mon matériel</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>STOOM — Assistant matériel (tablette)</title>
 
-<style>
-:root{
-  --bg:#f6f7fb;
-  --card:#ffffff;
-  --border:#e4e8f0;
-  --main:#1f4fd8;
-  --text:#111;
-  --muted:#667;
-}
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  background:var(--bg);
-  color:var(--text);
-}
-.wrap{
-  max-width:900px;
-  margin:24px auto;
-  padding:16px;
-}
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:20px;
-  box-shadow:0 6px 18px rgba(0,0,0,.06);
-}
-h1{margin:0 0 8px;}
-p{color:var(--muted);}
+  <style>
+    :root{
+      --bg0:#070A12;
+      --bg1:#0B1020;
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.085);
+      --stroke:rgba(255,255,255,.12);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.68);
+      --muted2:rgba(255,255,255,.52);
+      --brand:#3B82F6;     /* bleu STOOM (modifiable) */
+      --brand2:#60A5FA;
+      --ok:#22C55E;
+      --warn:#F59E0B;
+      --bad:#EF4444;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --r: 22px;
+      --tap: 64px;
+    }
 
-.step{margin-top:20px;}
-.step h2{font-size:18px;margin-bottom:10px;}
+    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1000px 600px at 20% 10%, rgba(59,130,246,.35), transparent 55%),
+        radial-gradient(900px 600px at 80% 20%, rgba(96,165,250,.22), transparent 55%),
+        radial-gradient(900px 600px at 50% 100%, rgba(34,197,94,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
 
-.options{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:10px;
-}
-button.opt{
-  border:1px solid var(--border);
-  background:#fff;
-  border-radius:12px;
-  padding:12px;
-  text-align:left;
-  cursor:pointer;
-}
-button.opt.active{
-  border-color:var(--main);
-  outline:2px solid rgba(31,79,216,.15);
-}
+    .wrap{
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 22px 18px 40px;
+    }
 
-.btn{
-  margin-top:20px;
-  background:var(--main);
-  color:#fff;
-  border:none;
-  padding:14px;
-  width:100%;
-  border-radius:14px;
-  font-size:16px;
-  font-weight:600;
-  cursor:pointer;
-}
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom: 14px;
+    }
 
-.result{
-  margin-top:24px;
-  border-top:1px solid var(--border);
-  padding-top:20px;
-}
-.badge{
-  display:inline-block;
-  padding:6px 10px;
-  background:#eef2ff;
-  border-radius:999px;
-  margin-right:6px;
-  font-size:13px;
-}
-.block{
-  background:#f8faff;
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:14px;
-  margin-top:12px;
-}
-strong{color:#000;}
-</style>
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+    .logo{
+      width:44px; height:44px;
+      border-radius:14px;
+      background:
+        radial-gradient(18px 18px at 30% 30%, rgba(255,255,255,.45), transparent 60%),
+        linear-gradient(135deg, rgba(59,130,246,.95), rgba(96,165,250,.65));
+      box-shadow: 0 10px 30px rgba(59,130,246,.22);
+      border:1px solid rgba(255,255,255,.20);
+      flex:0 0 auto;
+    }
+    .brand h1{
+      font-size: 18px;
+      line-height:1.15;
+      margin:0;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .brand p{
+      margin:2px 0 0;
+      font-size: 12.5px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex:0 0 auto;
+    }
+
+    .pill{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--muted);
+      font-size: 12.5px;
+    }
+    .dot{
+      width:8px;height:8px;border-radius:50%;
+      background: var(--ok);
+      box-shadow:0 0 0 6px rgba(34,197,94,.12);
+    }
+
+    .btn{
+      border:none;
+      border-radius: 16px;
+      min-height: 48px;
+      padding: 12px 14px;
+      font-weight: 700;
+      letter-spacing:.2px;
+      color: rgba(255,255,255,.94);
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      cursor:pointer;
+      transition: transform .08s ease, background .15s ease, border-color .15s ease;
+    }
+    .btn:active{ transform: translateY(1px) scale(.99); }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(96,165,250,.75));
+      border-color: rgba(255,255,255,.20);
+      box-shadow: 0 14px 40px rgba(59,130,246,.18);
+    }
+    .btn.ghost{
+      background: rgba(255,255,255,.06);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      align-items:start;
+    }
+
+    .panel{
+      background: var(--card);
+      border:1px solid var(--stroke);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .panelHead{
+      padding: 16px 16px 12px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+    }
+    .panelHead .title{
+      margin:0;
+      font-size: 15px;
+      letter-spacing:.2px;
+    }
+    .panelHead .sub{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height:1.35;
+      max-width: 58ch;
+    }
+
+    /* Progress */
+    .progressWrap{
+      padding: 0 16px 14px;
+    }
+    .progress{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .bar{
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(59,130,246,.95), rgba(96,165,250,.65));
+      border-right:1px solid rgba(255,255,255,.24);
+      transition: width .25s ease;
+    }
+    .stepsRow{
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      color:var(--muted2);
+      font-size: 12px;
+    }
+    .stepChip{
+      padding: 7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+    }
+    .stepChip.on{
+      color: rgba(255,255,255,.90);
+      border-color: rgba(59,130,246,.45);
+      background: rgba(59,130,246,.12);
+    }
+
+    /* Questions */
+    .content{
+      padding: 14px 16px 16px;
+    }
+
+    .q{
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: rgba(255,255,255,.90);
+      letter-spacing:.2px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .q small{
+      font-weight:600;
+      color: var(--muted2);
+    }
+
+    .options{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+    }
+
+    .opt{
+      min-height: var(--tap);
+      padding: 14px 14px;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      cursor:pointer;
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      transition: background .15s ease, border-color .15s ease, transform .08s ease;
+      user-select:none;
+    }
+    .opt:active{ transform: translateY(1px) scale(.995); }
+    .opt .icon{
+      width:38px;height:38px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.07);
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      color: rgba(255,255,255,.86);
+      flex:0 0 auto;
+    }
+    .opt .txt{ min-width:0; }
+    .opt .txt .t{
+      font-weight:800;
+      letter-spacing:.2px;
+      font-size: 14px;
+      margin:0 0 4px;
+    }
+    .opt .txt .d{
+      margin:0;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height:1.25;
+    }
+
+    .opt.on{
+      background: rgba(59,130,246,.12);
+      border-color: rgba(59,130,246,.55);
+      box-shadow: 0 10px 26px rgba(59,130,246,.12);
+    }
+    .opt.on .icon{
+      background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(96,165,250,.65));
+      border-color: rgba(255,255,255,.20);
+    }
+
+    .navRow{
+      margin-top: 14px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    /* Side summary */
+    .side{
+      padding: 14px;
+    }
+    .summaryTitle{
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: rgba(255,255,255,.88);
+    }
+    .mini{
+      display:grid;
+      gap:10px;
+    }
+    .miniCard{
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      padding: 12px 12px;
+    }
+    .miniCard .k{
+      color: var(--muted2);
+      font-size: 12px;
+      margin:0 0 6px;
+    }
+    .miniCard .v{
+      margin:0;
+      font-weight:800;
+      font-size: 13.5px;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .hint{
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height:1.35;
+    }
+
+    /* Result */
+    .result{
+      margin-top: 14px;
+      padding: 14px 14px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+    }
+    .badges{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+    .b{
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight:800;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+    }
+    .b.ok{ background: rgba(34,197,94,.10); border-color: rgba(34,197,94,.35); }
+    .b.warn{ background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.40); }
+    .b.info{ background: rgba(59,130,246,.12); border-color: rgba(59,130,246,.40); }
+
+    .kpis{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:10px;
+      margin-top: 10px;
+    }
+    .kpi{
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      padding: 12px;
+    }
+    .kpi .k{ margin:0 0 6px; color: var(--muted2); font-size: 12px; }
+    .kpi .v{ margin:0; font-weight:900; font-size: 14px; }
+    .kpi .s{ margin:6px 0 0; color: var(--muted); font-size: 12px; line-height:1.25; }
+
+    .list{
+      margin: 12px 0 0;
+      padding: 0;
+      list-style:none;
+      display:grid;
+      gap:8px;
+    }
+    .li{
+      display:flex; gap:10px; align-items:flex-start;
+      padding: 10px 10px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+    }
+    .li .ic{
+      width:26px;height:26px;border-radius:10px;
+      display:grid;place-items:center;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      flex:0 0 auto;
+      font-weight:900;
+      color: rgba(255,255,255,.86);
+    }
+    .li .tx{
+      min-width:0;
+      color: rgba(255,255,255,.86);
+      font-size: 12.8px;
+      line-height:1.25;
+    }
+
+    .tools{
+      display:flex;
+      gap:10px;
+      margin-top: 12px;
+    }
+    .tools .btn{ flex:1; }
+
+    /* Tablet friendliness */
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .kpis{ grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 
 <body>
-<div class="wrap">
-<div class="card">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div style="min-width:0">
+          <h1>STOOM — Assistant matériel</h1>
+          <p>Parcours vendeur • tablette tactile • recommandations cohérentes sevrage</p>
+        </div>
+      </div>
 
-<h1>Choisir mon matériel de vape</h1>
-<p>Outil d’orientation STOOM – pour un matériel adapté à votre profil et éviter les erreurs.</p>
+      <div class="actions">
+        <div class="pill"><span class="dot"></span>Prêt en boutique</div>
+        <button class="btn ghost" id="resetBtn" type="button">Réinitialiser</button>
+      </div>
+    </div>
 
-<!-- STEP 1 -->
-<div class="step">
-<h2>1️⃣ Votre consommation</h2>
-<div class="options" id="cigarettes">
-  <button class="opt" data-value="low">– 10 cigarettes / jour</button>
-  <button class="opt" data-value="mid">10 à 15 cigarettes / jour</button>
-  <button class="opt" data-value="high">15 à 20 cigarettes / jour</button>
-  <button class="opt" data-value="veryhigh">20+ cigarettes / jour</button>
-</div>
-</div>
+    <div class="grid">
+      <!-- Main panel -->
+      <section class="panel" aria-label="Parcours">
+        <header class="panelHead">
+          <div>
+            <h2 class="title" id="panelTitle">Étape 1 — Profil fumeur</h2>
+            <p class="sub" id="panelSub">
+              On commence simple : consommation + type de sensation. L’objectif : confort et zéro frustration.
+            </p>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:900;font-size:12px;color:var(--muted2);">Progression</div>
+            <div style="font-weight:900;font-size:16px;" id="pct">0%</div>
+          </div>
+        </header>
 
-<!-- STEP 2 -->
-<div class="step">
-<h2>2️⃣ Ce que vous recherchez</h2>
-<div class="options" id="sensation">
-  <button class="opt" data-value="cig">Sensation proche de la cigarette</button>
-  <button class="opt" data-value="vapeur">Plus de vapeur</button>
-  <button class="opt" data-value="simple">Simple & discret</button>
-</div>
-</div>
+        <div class="progressWrap">
+          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="bar" id="bar"></div>
+          </div>
+          <div class="stepsRow" id="chips">
+            <span class="stepChip on">1 Profil</span>
+            <span class="stepChip">2 Habitudes</span>
+            <span class="stepChip">3 Priorités</span>
+            <span class="stepChip">Résultat</span>
+          </div>
+        </div>
 
-<!-- STEP 3 -->
-<div class="step">
-<h2>3️⃣ Votre expérience</h2>
-<div class="options" id="experience">
-  <button class="opt" data-value="beginner">Débutant</button>
-  <button class="opt" data-value="intermediate">Déjà vapoté</button>
-  <button class="opt" data-value="advanced">Confirmé</button>
-</div>
-</div>
+        <div class="content" id="content"></div>
+      </section>
 
-<button class="btn" onclick="analyser()">Voir la recommandation STOOM</button>
+      <!-- Side panel -->
+      <aside class="panel" aria-label="Résumé">
+        <div class="side">
+          <h3 class="summaryTitle">Résumé client</h3>
 
-<div class="result" id="result" style="display:none;">
-  <h2>🔎 Recommandation STOOM</h2>
+          <div class="mini">
+            <div class="miniCard">
+              <p class="k">Consommation</p>
+              <p class="v" id="sCigs">—</p>
+            </div>
+            <div class="miniCard">
+              <p class="k">Sensation recherchée</p>
+              <p class="v" id="sFeel">—</p>
+            </div>
+            <div class="miniCard">
+              <p class="k">Niveau</p>
+              <p class="v" id="sLevel">—</p>
+            </div>
+            <div class="miniCard">
+              <p class="k">Contexte</p>
+              <p class="v" id="sContext">—</p>
+            </div>
+            <div class="miniCard">
+              <p class="k">Priorité</p>
+              <p class="v" id="sPriority">—</p>
+            </div>
+          </div>
 
-  <div class="block">
-    <p><strong>Type de tirage :</strong> <span id="tirage"></span></p>
-    <p><strong>Puissance :</strong> <span id="puissance"></span></p>
-    <p><strong>Autonomie :</strong> <span id="autonomie"></span></p>
+          <p class="hint">
+            💡 Astuce vendeur : si le client hésite, privilégier le confort (tirage serré + dosage adapté) avant de parler “grosse vapeur”.
+          </p>
+
+          <div class="result" id="resultBox" style="display:none;">
+            <div class="badges" id="badges"></div>
+
+            <div class="kpis">
+              <div class="kpi">
+                <p class="k">Tirage conseillé</p>
+                <p class="v" id="rDraw">—</p>
+                <p class="s" id="rDrawNote"></p>
+              </div>
+              <div class="kpi">
+                <p class="k">Puissance & résistance</p>
+                <p class="v" id="rPower">—</p>
+                <p class="s" id="rPowerNote"></p>
+              </div>
+              <div class="kpi">
+                <p class="k">Nicotine (repère)</p>
+                <p class="v" id="rNico">—</p>
+                <p class="s" id="rNicoNote"></p>
+              </div>
+            </div>
+
+            <ul class="list" id="avoid"></ul>
+
+            <div class="tools">
+              <button class="btn ghost" id="copyBtn" type="button">Copier le résumé</button>
+              <button class="btn primary" id="newBtn" type="button">Nouveau client</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
   </div>
-
-  <div class="block">
-    <p><strong>Nicotine conseillée :</strong> <span id="nicotine"></span></p>
-    <p><strong>Pourquoi :</strong> <span id="explication"></span></p>
-  </div>
-
-  <div class="block">
-    <p><strong>⚠️ À éviter :</strong></p>
-    <ul id="eviter"></ul>
-  </div>
-
-  <p style="margin-top:12px;font-size:14px;color:var(--muted);">
-    💡 Conseil STOOM : le bon matériel est celui qui évite la frustration et la rechute, pas celui qui fait le plus de vapeur.
-  </p>
-</div>
-
-</div>
-</div>
 
 <script>
-function select(group,id){
-  document.querySelectorAll("#"+group+" .opt").forEach(b=>b.classList.remove("active"));
-  id.classList.add("active");
-}
-document.querySelectorAll(".opt").forEach(b=>{
-  b.onclick=()=>select(b.parentElement.id,b);
-});
+  // --------- State ----------
+  const state = {
+    step: 1,
+    cigs: null,     // low, mid, high, veryhigh
+    feel: null,     // cig, balanced, vapeur
+    level: null,    // beginner, intermediate, advanced
+    context: null,  // quick, home, car, mixed
+    priority: null  // simple, autonomie, discret, vapeur
+  };
 
-function analyser(){
-  const cig=document.querySelector("#cigarettes .active")?.dataset.value;
-  const sen=document.querySelector("#sensation .active")?.dataset.value;
-  const exp=document.querySelector("#experience .active")?.dataset.value;
-  if(!cig||!sen||!exp){alert("Merci de répondre à toutes les questions.");return;}
+  // Labels
+  const L = {
+    cigs: {
+      low: "– 10 cig/j",
+      mid: "10–15 cig/j",
+      high: "15–20 cig/j",
+      veryhigh: "20+ cig/j"
+    },
+    feel: {
+      cig: "Proche cigarette (hit / tirage serré)",
+      balanced: "Équilibré (confort + polyvalent)",
+      vapeur: "Plus de vapeur (sans se cramer)"
+    },
+    level: {
+      beginner: "Débutant",
+      intermediate: "Déjà vapoté",
+      advanced: "Confirmé"
+    },
+    context: {
+      quick: "Pauses rapides (travail)",
+      home: "Plutôt maison",
+      car: "Beaucoup voiture",
+      mixed: "Un peu partout"
+    },
+    priority: {
+      simple: "Simple & fiable",
+      autonomie: "Autonomie",
+      discret: "Discret",
+      vapeur: "Vapeur"
+    }
+  };
 
-  let tirage="Serré (MTL)";
-  let puissance="Faible";
-  let autonomie="Moyenne";
-  let nicotine="6 à 12 mg/ml";
-  let explication="Profil orienté sevrage progressif.";
-  let eviter=[];
+  // --------- UI helpers ----------
+  const $ = (sel) => document.querySelector(sel);
 
-  if(cig==="veryhigh"){
-    nicotine="12 à 20 mg/ml (sels possibles)";
-    eviter.push("Matériel trop puissant","Inhalation directe");
+  function setSummary(){
+    $("#sCigs").textContent = state.cigs ? L.cigs[state.cigs] : "—";
+    $("#sFeel").textContent = state.feel ? L.feel[state.feel] : "—";
+    $("#sLevel").textContent = state.level ? L.level[state.level] : "—";
+    $("#sContext").textContent = state.context ? L.context[state.context] : "—";
+    $("#sPriority").textContent = state.priority ? L.priority[state.priority] : "—";
   }
-  if(sen==="vapeur"){
-    tirage="Semi-aérien (RDL)";
-    puissance="Modérée";
-    autonomie="Bonne";
-    eviter.push("Nicotine trop élevée");
+
+  function setProgress(){
+    const totalSteps = 4;
+    const pct = Math.round(((state.step-1) / (totalSteps-1)) * 100);
+    $("#pct").textContent = pct + "%";
+    $("#bar").style.width = pct + "%";
+    $(".progress").setAttribute("aria-valuenow", String(pct));
+
+    const chips = [...$("#chips").children];
+    chips.forEach((c, i) => c.classList.toggle("on", i <= state.step-1));
   }
-  if(exp==="beginner"){
-    eviter.push("Réglages complexes","Matériel trop volumineux");
+
+  function cardOption({key, value, icon, title, desc}){
+    const on = state[key] === value ? " on" : "";
+    return `
+      <div class="opt${on}" role="button" tabindex="0"
+           data-key="${key}" data-value="${value}">
+        <div class="icon">${icon}</div>
+        <div class="txt">
+          <p class="t">${title}</p>
+          <p class="d">${desc}</p>
+        </div>
+      </div>
+    `;
   }
 
-  document.getElementById("tirage").textContent=tirage;
-  document.getElementById("puissance").textContent=puissance;
-  document.getElementById("autonomie").textContent=autonomie;
-  document.getElementById("nicotine").textContent=nicotine;
-  document.getElementById("explication").textContent=explication;
+  function mount(html){
+    $("#content").innerHTML = html;
+    // click + enter/space
+    $("#content").querySelectorAll(".opt").forEach(el => {
+      el.addEventListener("click", () => pick(el.dataset.key, el.dataset.value));
+      el.addEventListener("keydown", (e) => {
+        if(e.key === "Enter" || e.key === " "){
+          e.preventDefault();
+          pick(el.dataset.key, el.dataset.value);
+        }
+      });
+    });
+  }
 
-  const ul=document.getElementById("eviter");
-  ul.innerHTML="";
-  eviter.forEach(e=>{
-    const li=document.createElement("li");
-    li.textContent=e;
-    ul.appendChild(li);
-  });
+  function pick(key, value){
+    state[key] = value;
+    render(); // keep step, just update selection
+    // auto-advance when a step is complete (smooth, vendeur-friendly)
+    autoAdvance();
+  }
 
-  document.getElementById("result").style.display="block";
-}
+  function stepComplete(n){
+    if(n === 1) return !!(state.cigs && state.feel);
+    if(n === 2) return !!(state.level && state.context);
+    if(n === 3) return !!(state.priority);
+    return true;
+  }
+
+  function autoAdvance(){
+    if(state.step === 1 && stepComplete(1)){ state.step = 2; render(); return; }
+    if(state.step === 2 && stepComplete(2)){ state.step = 3; render(); return; }
+    if(state.step === 3 && stepComplete(3)){ state.step = 4; render(); return; }
+  }
+
+  function navButtons(){
+    const backDisabled = state.step === 1;
+    const nextDisabled = (state.step === 1 && !stepComplete(1)) ||
+                         (state.step === 2 && !stepComplete(2)) ||
+                         (state.step === 3 && !stepComplete(3));
+    const nextLabel = state.step < 4 ? "Continuer" : "Revoir";
+    return `
+      <div class="navRow">
+        <button class="btn ghost" type="button" ${backDisabled ? "disabled" : ""} id="backBtn">Retour</button>
+        <button class="btn primary" type="button" ${nextDisabled ? "disabled" : ""} id="nextBtn">${nextLabel}</button>
+      </div>
+    `;
+  }
+
+  function wireNav(){
+    const back = $("#backBtn");
+    const next = $("#nextBtn");
+    if(back) back.onclick = () => { state.step = Math.max(1, state.step-1); render(); };
+    if(next) next.onclick = () => {
+      if(state.step < 4){
+        state.step += 1;
+        render();
+      }else{
+        // "Revoir" -> back to step 1
+        state.step = 1;
+        render();
+      }
+    };
+  }
+
+  // --------- Recommendation engine (STOOM rules) ----------
+  function recommend(){
+    // Base recommendation
+    let draw = "Serré (MTL)";
+    let drawNote = "Sensation proche de la cigarette, très efficace en sevrage.";
+    let power = "Faible à modérée • 10–18W • résistances 0.8–1.4Ω";
+    let powerNote = "Confort, hit maîtrisé, peu d’irritation.";
+    let nico = "3–6 mg/ml";
+    let nicoNote = "Ajuster selon envies / fréquence. Objectif : zéro frustration.";
+
+    const badges = [];
+    const avoid = [];
+
+    // Consumption influence
+    if(state.cigs === "low"){
+      nico = "3–6 mg/ml";
+      badges.push({t:"Profil léger", c:"info"});
+    }
+    if(state.cigs === "mid"){
+      nico = "6–12 mg/ml";
+      badges.push({t:"Profil modéré", c:"info"});
+      avoid.push("Partir trop bas en nicotine (risque d’envies persistantes).");
+    }
+    if(state.cigs === "high"){
+      nico = "10–12 mg/ml (ou 10 mg sels selon confort)";
+      badges.push({t:"Profil soutenu", c:"warn"});
+      avoid.push("Matériel trop puissant avec nicotine élevée (hit trop fort / irritation).");
+    }
+    if(state.cigs === "veryhigh"){
+      nico = "12–20 mg/ml (sels possibles)";
+      badges.push({t:"Profil intense", c:"warn"});
+      draw = "Serré (MTL) ou très restrictif";
+      drawNote = "Priorité au hit + satiété nicotinique pour éviter la rechute.";
+      power = "Faible • 8–15W • résistances 1.0–1.4Ω";
+      powerNote = "Plus stable et confortable avec des dosages élevés.";
+      avoid.push("Inhalation directe (DL) au démarrage.");
+      avoid.push("Baisser trop vite la nicotine (frustration → rechute).");
+    }
+
+    // Desired sensation influence
+    if(state.feel === "cig"){
+      draw = "Serré (MTL)";
+      drawNote = "Tirage serré + hit : repère proche cigarette.";
+      badges.push({t:"Priorité sevrage", c:"ok"});
+    }
+    if(state.feel === "balanced"){
+      draw = "MTL confortable / RDL léger";
+      drawNote = "Polyvalent : bon compromis sensation / vapeur.";
+      power = "Modérée • 12–22W • résistances 0.6–1.0Ω";
+      powerNote = "Convient à beaucoup de profils, surtout déjà vapoteurs.";
+      badges.push({t:"Polyvalent", c:"info"});
+    }
+    if(state.feel === "vapeur"){
+      draw = "Semi-aérien (RDL)";
+      drawNote = "Plus de vapeur, mais sans sacrifier le confort.";
+      power = "Modérée • 18–30W • résistances 0.4–0.8Ω";
+      powerNote = "Dosage nicotine souvent plus bas en RDL.";
+      badges.push({t:"Vapeur maîtrisée", c:"info"});
+      avoid.push("Rester haut en nicotine avec un tirage trop aérien.");
+    }
+
+    // Experience influence
+    if(state.level === "beginner"){
+      badges.push({t:"Débutant", c:"ok"});
+      avoid.push("Trop de réglages / matériel complexe au départ.");
+      // keep stable
+    }
+    if(state.level === "intermediate"){
+      badges.push({t:"Déjà vapoté", c:"info"});
+    }
+    if(state.level === "advanced"){
+      badges.push({t:"Confirmé", c:"info"});
+      // allow more power if feel vapeur
+      if(state.feel === "vapeur"){
+        power = "Modérée à soutenue • 25–45W • résistances 0.2–0.6Ω";
+        powerNote = "Uniquement si le dosage nicotine est adapté et le client sait gérer.";
+      }
+    }
+
+    // Context influence
+    if(state.context === "quick"){
+      badges.push({t:"Pauses rapides", c:"info"});
+      avoid.push("Autonomie trop faible (risque de panne en journée).");
+    }
+    if(state.context === "car"){
+      badges.push({t:"Voiture", c:"info"});
+      avoid.push("Airflow trop ouvert (projection / bruit).");
+    }
+
+    // Priority influence
+    if(state.priority === "simple"){
+      badges.push({t:"Simple & fiable", c:"ok"});
+      drawNote += " Idéal en kit/pod simple.";
+    }
+    if(state.priority === "autonomie"){
+      badges.push({t:"Autonomie", c:"info"});
+      avoid.push("Petite batterie si grosse conso → frustration.");
+    }
+    if(state.priority === "discret"){
+      badges.push({t:"Discret", c:"info"});
+      avoid.push("Gros setup si le client veut du pocket-friendly.");
+    }
+    if(state.priority === "vapeur"){
+      badges.push({t:"Vapeur", c:"info"});
+      // already handled by feel, but keep reminder
+      avoid.push("Chercher la vapeur avant la stabilité (risque d’abandon).");
+    }
+
+    // Clean avoid duplicates
+    const uniqAvoid = [...new Set(avoid)];
+    if(uniqAvoid.length === 0){
+      uniqAvoid.push("Changer trop de paramètres en même temps : y aller progressivement.");
+    }
+
+    return { draw, drawNote, power, powerNote, nico, nicoNote, badges, uniqAvoid };
+  }
+
+  function showResult(){
+    const rec = recommend();
+    $("#resultBox").style.display = "block";
+
+    // badges
+    const b = rec.badges.slice(0,6).map(x => `<span class="b ${x.c}">${x.t}</span>`).join("");
+    $("#badges").innerHTML = b || `<span class="b info">Recommandation</span>`;
+
+    $("#rDraw").textContent = rec.draw;
+    $("#rDrawNote").textContent = rec.drawNote;
+
+    $("#rPower").textContent = rec.power;
+    $("#rPowerNote").textContent = rec.powerNote;
+
+    $("#rNico").textContent = rec.nico;
+    $("#rNicoNote").textContent = rec.nicoNote;
+
+    $("#avoid").innerHTML = rec.uniqAvoid
+      .slice(0,5)
+      .map(t => `<li class="li"><div class="ic">!</div><div class="tx">${t}</div></li>`)
+      .join("");
+
+    // Copy summary
+    $("#copyBtn").onclick = async () => {
+      const txt =
+`STOOM — Résumé orientation matériel
+- Consommation : ${state.cigs ? L.cigs[state.cigs] : "—"}
+- Sensation : ${state.feel ? L.feel[state.feel] : "—"}
+- Niveau : ${state.level ? L.level[state.level] : "—"}
+- Contexte : ${state.context ? L.context[state.context] : "—"}
+- Priorité : ${state.priority ? L.priority[state.priority] : "—"}
+
+Recommandation :
+- Tirage : ${rec.draw}
+- Puissance : ${rec.power}
+- Nicotine (repère) : ${rec.nico}
+
+À éviter :
+- ${rec.uniqAvoid.slice(0,3).join("\n- ")}
+`;
+      try{
+        await navigator.clipboard.writeText(txt);
+        $("#copyBtn").textContent = "Copié ✓";
+        setTimeout(()=>$("#copyBtn").textContent="Copier le résumé", 1200);
+      }catch(e){
+        alert("Copie impossible sur cet appareil. (Astuce : utiliser Chrome)");
+      }
+    };
+
+    $("#newBtn").onclick = resetAll;
+  }
+
+  // --------- Rendering ----------
+  function render(){
+    setSummary();
+
+    // Header per step
+    const titles = {
+      1: ["Étape 1 — Profil fumeur", "Consommation + sensation recherchée. On vise un matériel qui évite la frustration."],
+      2: ["Étape 2 — Habitudes", "Contexte d’utilisation + expérience. On sécurise l’usage au quotidien."],
+      3: ["Étape 3 — Priorité", "On finalise : simplicité, autonomie, discrétion ou vapeur."],
+      4: ["Résultat — Recommandation STOOM", "Synthèse claire + points de vigilance. Le vendeur peut copier le résumé."]
+    };
+    $("#panelTitle").textContent = titles[state.step][0];
+    $("#panelSub").textContent   = titles[state.step][1];
+
+    setProgress();
+
+    // Step content
+    if(state.step === 1){
+      mount(`
+        <div class="q">Consommation <small>obligatoire</small></div>
+        <div class="options">
+          ${cardOption({key:"cigs", value:"low", icon:"①", title:"– 10 / jour", desc:"Profil léger • objectif confort."})}
+          ${cardOption({key:"cigs", value:"mid", icon:"②", title:"10–15 / jour", desc:"Profil modéré • besoin stable."})}
+          ${cardOption({key:"cigs", value:"high", icon:"③", title:"15–20 / jour", desc:"Profil soutenu • vigilance dosage."})}
+          ${cardOption({key:"cigs", value:"veryhigh", icon:"④", title:"20+ / jour", desc:"Profil intense • priorité satiété."})}
+        </div>
+
+        <div style="height:14px"></div>
+
+        <div class="q">Sensation recherchée <small>obligatoire</small></div>
+        <div class="options">
+          ${cardOption({key:"feel", value:"cig", icon:"⟂", title:"Proche cigarette", desc:"Hit + tirage serré (MTL)."} )}
+          ${cardOption({key:"feel", value:"balanced", icon:"≈", title:"Équilibré", desc:"Polyvalent • bon compromis."} )}
+          ${cardOption({key:"feel", value:"vapeur", icon:"☁︎", title:"Plus de vapeur", desc:"RDL • vapeur maîtrisée."} )}
+          <div style="opacity:.0;pointer-events:none"></div>
+        </div>
+
+        ${navButtons()}
+      `);
+      wireNav();
+      $("#resultBox").style.display = "none";
+    }
+
+    if(state.step === 2){
+      mount(`
+        <div class="q">Niveau d’expérience <small>obligatoire</small></div>
+        <div class="options">
+          ${cardOption({key:"level", value:"beginner", icon:"★", title:"Débutant", desc:"On privilégie simple & fiable."})}
+          ${cardOption({key:"level", value:"intermediate", icon:"☆", title:"Déjà vapoté", desc:"On optimise confort/usage."})}
+          ${cardOption({key:"level", value:"advanced", icon:"✦", title:"Confirmé", desc:"On peut affiner les réglages."})}
+          <div style="opacity:.0;pointer-events:none"></div>
+        </div>
+
+        <div style="height:14px"></div>
+
+        <div class="q">Contexte principal <small>obligatoire</small></div>
+        <div class="options">
+          ${cardOption({key:"context", value:"quick", icon:"⚡", title:"Pauses rapides", desc:"Besoin d’efficacité immédiate."})}
+          ${cardOption({key:"context", value:"home", icon:"⌂", title:"Maison", desc:"Confort + autonomie tranquille."})}
+          ${cardOption({key:"context", value:"car", icon:"⟟", title:"Voiture", desc:"Discrétion + stabilité airflow."})}
+          ${cardOption({key:"context", value:"mixed", icon:"⟲", title:"Partout", desc:"Polyvalence avant tout."})}
+        </div>
+
+        ${navButtons()}
+      `);
+      wireNav();
+      $("#resultBox").style.display = "none";
+    }
+
+    if(state.step === 3){
+      mount(`
+        <div class="q">Votre priorité n°1 <small>obligatoire</small></div>
+        <div class="options">
+          ${cardOption({key:"priority", value:"simple", icon:"✓", title:"Simple & fiable", desc:"Zéro prise de tête, efficace."})}
+          ${cardOption({key:"priority", value:"autonomie", icon:"🔋", title:"Autonomie", desc:"Tenir la journée sans stress."})}
+          ${cardOption({key:"priority", value:"discret", icon:"◻︎", title:"Discret", desc:"Compact, discret, pratique."})}
+          ${cardOption({key:"priority", value:"vapeur", icon:"☁", title:"Vapeur", desc:"Plus de densité (maîtrisée)."})}
+        </div>
+
+        ${navButtons()}
+      `);
+      wireNav();
+      $("#resultBox").style.display = "none";
+    }
+
+    if(state.step === 4){
+      mount(`
+        <div class="q">Synthèse prête <small>copiable</small></div>
+        <div style="color:var(--muted);font-size:13px;line-height:1.45">
+          Le panneau de droite affiche la recommandation STOOM + les points de vigilance.  
+          Vous pouvez <strong>copier le résumé</strong> pour le noter sur une fiche client, un SMS, ou WhatsApp.
+        </div>
+        ${navButtons()}
+      `);
+      wireNav();
+      showResult();
+    }
+
+    // button states (disabled style)
+    document.querySelectorAll("button[disabled]").forEach(b=>{
+      b.style.opacity = .55;
+      b.style.cursor = "not-allowed";
+    });
+  }
+
+  function resetAll(){
+    state.step = 1;
+    state.cigs = null;
+    state.feel = null;
+    state.level = null;
+    state.context = null;
+    state.priority = null;
+    $("#resultBox").style.display = "none";
+    render();
+  }
+
+  $("#resetBtn").onclick = resetAll;
+
+  // Init
+  render();
 </script>
 </body>
 </html>
