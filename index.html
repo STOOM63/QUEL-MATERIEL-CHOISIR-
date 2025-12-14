@@ -15,7 +15,7 @@
       --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.68);
       --muted2:rgba(255,255,255,.52);
-      --brand:#3B82F6;     /* bleu STOOM (modifiable) */
+      --brand:#3B82F6;
       --brand2:#60A5FA;
       --ok:#22C55E;
       --warn:#F59E0B;
@@ -302,7 +302,12 @@
     .mini{
       display:grid;
       gap:10px;
+      max-height: 360px;
+      overflow:auto;
+      padding-right:4px;
     }
+    .mini::-webkit-scrollbar{ width:8px; }
+    .mini::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.10); border-radius: 999px; }
     .miniCard{
       background: rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.12);
@@ -354,7 +359,7 @@
 
     .kpis{
       display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
+      grid-template-columns: repeat(2, minmax(0,1fr));
       gap:10px;
       margin-top: 10px;
     }
@@ -368,8 +373,17 @@
     .kpi .v{ margin:0; font-weight:900; font-size: 14px; }
     .kpi .s{ margin:6px 0 0; color: var(--muted); font-size: 12px; line-height:1.25; }
 
+    .sectionTitle{
+      margin: 14px 0 8px;
+      font-weight:900;
+      font-size: 12.5px;
+      color: rgba(255,255,255,.86);
+      letter-spacing:.25px;
+      text-transform: uppercase;
+    }
+
     .list{
-      margin: 12px 0 0;
+      margin: 10px 0 0;
       padding: 0;
       list-style:none;
       display:grid;
@@ -420,7 +434,7 @@
         <div class="logo" aria-hidden="true"></div>
         <div style="min-width:0">
           <h1>STOOM — Assistant matériel</h1>
-          <p>Parcours vendeur • tablette tactile • recommandations cohérentes sevrage</p>
+          <p>Parcours vendeur • tablette tactile • recommandations + tips + budget</p>
         </div>
       </div>
 
@@ -437,7 +451,7 @@
           <div>
             <h2 class="title" id="panelTitle">Étape 1 — Profil fumeur</h2>
             <p class="sub" id="panelSub">
-              On commence simple : consommation + type de sensation. L’objectif : confort et zéro frustration.
+              On commence simple : consommation + sensation recherchée. Objectif : confort et stabilité.
             </p>
           </div>
           <div style="text-align:right;">
@@ -453,7 +467,8 @@
           <div class="stepsRow" id="chips">
             <span class="stepChip on">1 Profil</span>
             <span class="stepChip">2 Habitudes</span>
-            <span class="stepChip">3 Priorités</span>
+            <span class="stepChip">3 Usage</span>
+            <span class="stepChip">4 Priorité</span>
             <span class="stepChip">Résultat</span>
           </div>
         </div>
@@ -476,6 +491,14 @@
               <p class="v" id="sFeel">—</p>
             </div>
             <div class="miniCard">
+              <p class="k">Habitudes</p>
+              <p class="v" id="sHabits">—</p>
+            </div>
+            <div class="miniCard">
+              <p class="k">Style</p>
+              <p class="v" id="sStyle">—</p>
+            </div>
+            <div class="miniCard">
               <p class="k">Niveau</p>
               <p class="v" id="sLevel">—</p>
             </div>
@@ -490,30 +513,40 @@
           </div>
 
           <p class="hint">
-            💡 Astuce vendeur : si le client hésite, privilégier le confort (tirage serré + dosage adapté) avant de parler “grosse vapeur”.
+            💡 Astuce vendeur : laisser le client choisir “ce qui compte le plus”, puis caler le matériel + dosage sur son quotidien (habitudes).
           </p>
 
           <div class="result" id="resultBox" style="display:none;">
             <div class="badges" id="badges"></div>
 
+            <div class="sectionTitle">Recommandations</div>
             <div class="kpis">
               <div class="kpi">
-                <p class="k">Tirage conseillé</p>
-                <p class="v" id="rDraw">—</p>
-                <p class="s" id="rDrawNote"></p>
+                <p class="k">Option A — Sécurité sevrage</p>
+                <p class="v" id="rA">—</p>
+                <p class="s" id="rANote"></p>
               </div>
               <div class="kpi">
-                <p class="k">Puissance & résistance</p>
-                <p class="v" id="rPower">—</p>
-                <p class="s" id="rPowerNote"></p>
+                <p class="k">Option B — Évolutive</p>
+                <p class="v" id="rB">—</p>
+                <p class="s" id="rBNote"></p>
               </div>
               <div class="kpi">
                 <p class="k">Nicotine (repère)</p>
                 <p class="v" id="rNico">—</p>
                 <p class="s" id="rNicoNote"></p>
               </div>
+              <div class="kpi">
+                <p class="k">Budget tabac estimé</p>
+                <p class="v" id="rBudget">—</p>
+                <p class="s" id="rBudgetNote">Base : 12,50 € / paquet (20 cig.)</p>
+              </div>
             </div>
 
+            <div class="sectionTitle">Tips personnalisés</div>
+            <ul class="list" id="tips"></ul>
+
+            <div class="sectionTitle">À éviter</div>
             <ul class="list" id="avoid"></ul>
 
             <div class="tools">
@@ -527,17 +560,19 @@
   </div>
 
 <script>
-  // --------- State ----------
+  // ---------------- STATE ----------------
   const state = {
     step: 1,
     cigs: null,     // low, mid, high, veryhigh
     feel: null,     // cig, balanced, vapeur
+    habits: [],     // multi: coffee, aftermeal, car, stress, party, morning, breaks, tv
+    style: null,    // ritual, chain, fewpuffs, finish
     level: null,    // beginner, intermediate, advanced
     context: null,  // quick, home, car, mixed
-    priority: null  // simple, autonomie, discret, vapeur
+    priority: null  // simple, autonomie, discret, vapeur, hit, gout, calme
   };
 
-  // Labels
+  // ---------------- LABELS ----------------
   const L = {
     cigs: {
       low: "– 10 cig/j",
@@ -548,7 +583,23 @@
     feel: {
       cig: "Proche cigarette (hit / tirage serré)",
       balanced: "Équilibré (confort + polyvalent)",
-      vapeur: "Plus de vapeur (sans se cramer)"
+      vapeur: "Plus de vapeur (maîtrisée)"
+    },
+    habits: {
+      coffee: "Café",
+      aftermeal: "Après repas",
+      car: "Voiture",
+      stress: "Stress",
+      breaks: "Pauses",
+      morning: "Réveil",
+      party: "Soirée",
+      tv: "TV / gaming"
+    },
+    style: {
+      ritual: "Une par une",
+      chain: "En rafale",
+      fewpuffs: "2–3 bouffées",
+      finish: "Je finis toujours"
     },
     level: {
       beginner: "Débutant",
@@ -560,28 +611,47 @@
       home: "Plutôt maison",
       car: "Beaucoup voiture",
       mixed: "Un peu partout"
-    },
-    priority: {
-      simple: "Simple & fiable",
-      autonomie: "Autonomie",
-      discret: "Discret",
-      vapeur: "Vapeur"
     }
   };
 
-  // --------- UI helpers ----------
+  // ---------------- HELPERS ----------------
   const $ = (sel) => document.querySelector(sel);
+
+  function fmt2(n){
+    return (Math.round((n + Number.EPSILON) * 100) / 100).toFixed(2);
+  }
+
+  function avgCigsPerDay(){
+    // mapping "crédible" (moyenne) basé sur les catégories
+    if(state.cigs === "low") return 8;
+    if(state.cigs === "mid") return 12.5;
+    if(state.cigs === "high") return 17.5;
+    if(state.cigs === "veryhigh") return 25;
+    return null;
+  }
+
+  function calcBudget(){
+    const cpd = avgCigsPerDay();
+    if(!cpd) return null;
+    const packPrice = 12.5;
+    const perDay = (cpd / 20) * packPrice;
+    const perMonth = perDay * 30;
+    const perYear = perDay * 365;
+    return { cpd, perDay, perMonth, perYear, packPrice };
+  }
 
   function setSummary(){
     $("#sCigs").textContent = state.cigs ? L.cigs[state.cigs] : "—";
     $("#sFeel").textContent = state.feel ? L.feel[state.feel] : "—";
+    $("#sHabits").textContent = state.habits.length ? state.habits.map(h => L.habits[h]).join(" • ") : "—";
+    $("#sStyle").textContent = state.style ? L.style[state.style] : "—";
     $("#sLevel").textContent = state.level ? L.level[state.level] : "—";
     $("#sContext").textContent = state.context ? L.context[state.context] : "—";
-    $("#sPriority").textContent = state.priority ? L.priority[state.priority] : "—";
+    $("#sPriority").textContent = state.priority ? state.priority : "—";
   }
 
   function setProgress(){
-    const totalSteps = 4;
+    const totalSteps = 5;
     const pct = Math.round(((state.step-1) / (totalSteps-1)) * 100);
     $("#pct").textContent = pct + "%";
     $("#bar").style.width = pct + "%";
@@ -591,15 +661,19 @@
     chips.forEach((c, i) => c.classList.toggle("on", i <= state.step-1));
   }
 
+  function isOn(key, value){
+    if(Array.isArray(state[key])) return state[key].includes(value);
+    return state[key] === value;
+  }
+
   function cardOption({key, value, icon, title, desc}){
-    const on = state[key] === value ? " on" : "";
+    const on = isOn(key, value) ? " on" : "";
     return `
-      <div class="opt${on}" role="button" tabindex="0"
-           data-key="${key}" data-value="${value}">
+      <div class="opt${on}" role="button" tabindex="0" data-key="${key}" data-value="${value}">
         <div class="icon">${icon}</div>
         <div class="txt">
           <p class="t">${title}</p>
-          <p class="d">${desc}</p>
+          <p class="d">${desc || ""}</p>
         </div>
       </div>
     `;
@@ -607,13 +681,22 @@
 
   function mount(html){
     $("#content").innerHTML = html;
-    // click + enter/space
+
     $("#content").querySelectorAll(".opt").forEach(el => {
-      el.addEventListener("click", () => pick(el.dataset.key, el.dataset.value));
+      const handler = () => {
+        const key = el.dataset.key;
+        const val = el.dataset.value;
+
+        if(key === "habits") return toggleHabit(val);
+        if(key === "style") return pickStyle(val);
+        return pick(key, val);
+      };
+
+      el.addEventListener("click", handler);
       el.addEventListener("keydown", (e) => {
         if(e.key === "Enter" || e.key === " "){
           e.preventDefault();
-          pick(el.dataset.key, el.dataset.value);
+          handler();
         }
       });
     });
@@ -621,15 +704,50 @@
 
   function pick(key, value){
     state[key] = value;
-    render(); // keep step, just update selection
-    // auto-advance when a step is complete (smooth, vendeur-friendly)
+
+    // priorité label plus "humain" (sans changer l’esthétique)
+    if(key === "priority"){
+      const map = {
+        simple: "Simple & fiable",
+        autonomie: "Autonomie",
+        discret: "Discret",
+        vapeur: "Vapeur",
+        hit: "Hit",
+        gout: "Goût",
+        calme: "Me calmer"
+      };
+      state.priority = map[value] || value;
+    }
+
+    render();
+    autoAdvance();
+  }
+
+  function toggleHabit(value){
+    const i = state.habits.indexOf(value);
+    if(i >= 0) state.habits.splice(i, 1);
+    else state.habits.push(value);
+
+    // garde l'outil rapide : max 4 habitudes
+    if(state.habits.length > 4){
+      state.habits.shift();
+    }
+
+    render();
+    autoAdvance();
+  }
+
+  function pickStyle(value){
+    state.style = value;
+    render();
     autoAdvance();
   }
 
   function stepComplete(n){
     if(n === 1) return !!(state.cigs && state.feel);
-    if(n === 2) return !!(state.level && state.context);
-    if(n === 3) return !!(state.priority);
+    if(n === 2) return !!(state.habits.length >= 1 && state.style);
+    if(n === 3) return !!(state.level && state.context);
+    if(n === 4) return !!(state.priority);
     return true;
   }
 
@@ -637,14 +755,16 @@
     if(state.step === 1 && stepComplete(1)){ state.step = 2; render(); return; }
     if(state.step === 2 && stepComplete(2)){ state.step = 3; render(); return; }
     if(state.step === 3 && stepComplete(3)){ state.step = 4; render(); return; }
+    if(state.step === 4 && stepComplete(4)){ state.step = 5; render(); return; }
   }
 
   function navButtons(){
     const backDisabled = state.step === 1;
     const nextDisabled = (state.step === 1 && !stepComplete(1)) ||
                          (state.step === 2 && !stepComplete(2)) ||
-                         (state.step === 3 && !stepComplete(3));
-    const nextLabel = state.step < 4 ? "Continuer" : "Revoir";
+                         (state.step === 3 && !stepComplete(3)) ||
+                         (state.step === 4 && !stepComplete(4));
+    const nextLabel = state.step < 5 ? "Continuer" : "Revoir";
     return `
       <div class="navRow">
         <button class="btn ghost" type="button" ${backDisabled ? "disabled" : ""} id="backBtn">Retour</button>
@@ -658,31 +778,93 @@
     const next = $("#nextBtn");
     if(back) back.onclick = () => { state.step = Math.max(1, state.step-1); render(); };
     if(next) next.onclick = () => {
-      if(state.step < 4){
+      if(state.step < 5){
         state.step += 1;
         render();
       }else{
-        // "Revoir" -> back to step 1
         state.step = 1;
         render();
       }
     };
   }
 
-  // --------- Recommendation engine (STOOM rules) ----------
+  // ---------------- TIPS ENGINE ----------------
+  function buildTips(){
+    const tips = [];
+    const h = new Set(state.habits);
+
+    if(h.has("coffee")){
+      tips.push("Commencer à vapoter 1–2 minutes avant le café : satiété plus rapide, moins de frustration.");
+    }
+    if(h.has("aftermeal")){
+      tips.push("Après repas : 2–3 minutes de vape suffisent souvent. Rester sur le confort, pas la grosse vapeur.");
+    }
+    if(h.has("stress")){
+      tips.push("Stress : rapprocher les bouffées quelques minutes. Si besoin, ajuster la nicotine plutôt que la puissance.");
+    }
+    if(h.has("car")){
+      tips.push("Voiture : matériel discret + tirage serré + airflow stable (moins de projections, plus pratique).");
+    }
+    if(h.has("breaks")){
+      tips.push("Pauses courtes : efficacité immédiate = tirage serré + dosage confortable + autonomie suffisante.");
+    }
+    if(h.has("morning")){
+      tips.push("Réveil : éviter le sous-dosage. Mieux vaut un dosage confortable qu’un matériel plus puissant.");
+    }
+    if(h.has("party")){
+      tips.push("Soirée : rester sur un set-up simple et stable. Éviter de bricoler les réglages.");
+    }
+    if(h.has("tv")){
+      tips.push("TV/gaming : attention à la surconsommation. Boire de l’eau et garder un dosage stable.");
+    }
+
+    // style
+    if(state.style === "chain"){
+      tips.push("Vous avez tendance à enchaîner : éviter matériel trop puissant + nicotine élevée (irritations).");
+    }
+    if(state.style === "fewpuffs"){
+      tips.push("2–3 bouffées : privilégier un kit simple, réactif, toujours prêt (sans réglages).");
+    }
+    if(state.style === "finish"){
+      tips.push("“Je finis toujours” : attention au sous-dosage (sinon on tire trop longtemps).");
+    }
+
+    // priorité
+    if(state.priority === "Hit"){
+      tips.push("Hit : on règle le confort via tirage + dosage, pas en montant la puissance.");
+    }
+    if(state.priority === "Goût"){
+      tips.push("Goût : puissance modérée et matériel stable = saveurs plus propres.");
+    }
+    if(state.priority === "Autonomie"){
+      tips.push("Autonomie : privilégier une batterie/format qui tient la journée pour éviter la panne (frustration).");
+    }
+
+    // dedupe + limit
+    return [...new Set(tips)].slice(0, 6);
+  }
+
+  // ---------------- RECOMMENDATION ENGINE ----------------
   function recommend(){
-    // Base recommendation
-    let draw = "Serré (MTL)";
-    let drawNote = "Sensation proche de la cigarette, très efficace en sevrage.";
-    let power = "Faible à modérée • 10–18W • résistances 0.8–1.4Ω";
-    let powerNote = "Confort, hit maîtrisé, peu d’irritation.";
+    // Base A (sécurité) + B (évolutive)
+    let A = {
+      draw: "Serré (MTL)",
+      power: "8–18W • 0.8–1.4Ω",
+      note: "Simple, stable, efficace pour démarrer."
+    };
+    let B = {
+      draw: "MTL confortable / RDL léger",
+      power: "12–30W • 0.4–1.0Ω",
+      note: "Évolutif si le client veut plus de polyvalence."
+    };
+
     let nico = "3–6 mg/ml";
-    let nicoNote = "Ajuster selon envies / fréquence. Objectif : zéro frustration.";
+    let nicoNote = "Objectif : confort. Si envies persistantes → ajuster la nicotine plutôt que la puissance.";
 
     const badges = [];
     const avoid = [];
 
-    // Consumption influence
+    // consommation
     if(state.cigs === "low"){
       nico = "3–6 mg/ml";
       badges.push({t:"Profil léger", c:"info"});
@@ -690,119 +872,156 @@
     if(state.cigs === "mid"){
       nico = "6–12 mg/ml";
       badges.push({t:"Profil modéré", c:"info"});
-      avoid.push("Partir trop bas en nicotine (risque d’envies persistantes).");
+      avoid.push("Partir trop bas en nicotine (envies persistantes).");
     }
     if(state.cigs === "high"){
       nico = "10–12 mg/ml (ou 10 mg sels selon confort)";
       badges.push({t:"Profil soutenu", c:"warn"});
       avoid.push("Matériel trop puissant avec nicotine élevée (hit trop fort / irritation).");
+      A.draw = "Serré (MTL) / restrictif";
+      A.power = "8–16W • 1.0–1.4Ω";
+      A.note = "Priorité satiété + hit maîtrisé.";
     }
     if(state.cigs === "veryhigh"){
       nico = "12–20 mg/ml (sels possibles)";
       badges.push({t:"Profil intense", c:"warn"});
-      draw = "Serré (MTL) ou très restrictif";
-      drawNote = "Priorité au hit + satiété nicotinique pour éviter la rechute.";
-      power = "Faible • 8–15W • résistances 1.0–1.4Ω";
-      powerNote = "Plus stable et confortable avec des dosages élevés.";
+      A.draw = "Serré (MTL) / très restrictif";
+      A.power = "8–15W • 1.0–1.4Ω";
+      A.note = "Satiété rapide, confort, anti-rechute.";
+      B.draw = "RDL léger (si déjà vapoteur)";
+      B.power = "15–28W • 0.4–0.8Ω";
+      B.note = "Uniquement si dosage adapté + bon accompagnement.";
       avoid.push("Inhalation directe (DL) au démarrage.");
-      avoid.push("Baisser trop vite la nicotine (frustration → rechute).");
+      avoid.push("Baisser trop vite la nicotine.");
     }
 
-    // Desired sensation influence
+    // sensation recherchée
     if(state.feel === "cig"){
-      draw = "Serré (MTL)";
-      drawNote = "Tirage serré + hit : repère proche cigarette.";
       badges.push({t:"Priorité sevrage", c:"ok"});
+      A.draw = "Serré (MTL)";
+      A.note = "Repère proche cigarette : tirage serré + hit.";
+      B.draw = "MTL confortable (un peu plus ouvert)";
+      B.note = "Évolutif sans perdre la stabilité.";
     }
     if(state.feel === "balanced"){
-      draw = "MTL confortable / RDL léger";
-      drawNote = "Polyvalent : bon compromis sensation / vapeur.";
-      power = "Modérée • 12–22W • résistances 0.6–1.0Ω";
-      powerNote = "Convient à beaucoup de profils, surtout déjà vapoteurs.";
       badges.push({t:"Polyvalent", c:"info"});
+      B.draw = "MTL confortable / RDL léger";
+      B.power = "12–25W • 0.6–1.0Ω";
+      B.note = "Très bon compromis confort/vapeur.";
     }
     if(state.feel === "vapeur"){
-      draw = "Semi-aérien (RDL)";
-      drawNote = "Plus de vapeur, mais sans sacrifier le confort.";
-      power = "Modérée • 18–30W • résistances 0.4–0.8Ω";
-      powerNote = "Dosage nicotine souvent plus bas en RDL.";
       badges.push({t:"Vapeur maîtrisée", c:"info"});
+      B.draw = "RDL";
+      B.power = "18–35W • 0.3–0.8Ω";
+      B.note = "Plus de vapeur, mais on garde le confort.";
       avoid.push("Rester haut en nicotine avec un tirage trop aérien.");
     }
 
-    // Experience influence
+    // experience
     if(state.level === "beginner"){
       badges.push({t:"Débutant", c:"ok"});
       avoid.push("Trop de réglages / matériel complexe au départ.");
-      // keep stable
-    }
-    if(state.level === "intermediate"){
-      badges.push({t:"Déjà vapoté", c:"info"});
+      B.note = "Évolutif mais toujours simple (pas une usine à gaz).";
     }
     if(state.level === "advanced"){
       badges.push({t:"Confirmé", c:"info"});
-      // allow more power if feel vapeur
       if(state.feel === "vapeur"){
-        power = "Modérée à soutenue • 25–45W • résistances 0.2–0.6Ω";
-        powerNote = "Uniquement si le dosage nicotine est adapté et le client sait gérer.";
+        B.power = "25–45W • 0.2–0.6Ω";
+        B.note = "Possible si le dosage nicotine est adapté et le client sait gérer.";
       }
     }
 
-    // Context influence
+    // contexte
     if(state.context === "quick"){
       badges.push({t:"Pauses rapides", c:"info"});
-      avoid.push("Autonomie trop faible (risque de panne en journée).");
+      avoid.push("Autonomie trop faible (panne → frustration).");
+      A.note += " Efficace rapidement en pause.";
     }
     if(state.context === "car"){
       badges.push({t:"Voiture", c:"info"});
       avoid.push("Airflow trop ouvert (projection / bruit).");
+      A.note += " Discret et stable en voiture.";
+    }
+    if(state.context === "mixed"){
+      badges.push({t:"Quotidien", c:"info"});
     }
 
-    // Priority influence
-    if(state.priority === "simple"){
-      badges.push({t:"Simple & fiable", c:"ok"});
-      drawNote += " Idéal en kit/pod simple.";
+    // priorité (affinage)
+    if(state.priority === "Simple & fiable"){
+      badges.push({t:"Simple", c:"ok"});
+      A.note = "Le plus simple et le plus robuste pour démarrer.";
     }
-    if(state.priority === "autonomie"){
+    if(state.priority === "Autonomie"){
       badges.push({t:"Autonomie", c:"info"});
-      avoid.push("Petite batterie si grosse conso → frustration.");
+      A.note += " Prévoir une autonomie journée.";
+      B.note += " Choisir un format qui tient la journée.";
     }
-    if(state.priority === "discret"){
+    if(state.priority === "Discret"){
       badges.push({t:"Discret", c:"info"});
+      A.note += " Format compact recommandé.";
       avoid.push("Gros setup si le client veut du pocket-friendly.");
     }
-    if(state.priority === "vapeur"){
+    if(state.priority === "Vapeur"){
       badges.push({t:"Vapeur", c:"info"});
-      // already handled by feel, but keep reminder
-      avoid.push("Chercher la vapeur avant la stabilité (risque d’abandon).");
+      B.note += " Rester progressif pour éviter l’abandon.";
+      avoid.push("Chercher la vapeur avant la stabilité.");
+    }
+    if(state.priority === "Hit"){
+      badges.push({t:"Hit", c:"info"});
+      avoid.push("Compenser un manque de nicotine par trop de puissance.");
+    }
+    if(state.priority === "Goût"){
+      badges.push({t:"Saveurs", c:"info"});
+    }
+    if(state.priority === "Me calmer"){
+      badges.push({t:"Confort", c:"ok"});
+      nicoNote = "Si ça ne calme pas : d’abord rapprocher les bouffées, sinon ajuster la nicotine (pas la puissance).";
     }
 
-    // Clean avoid duplicates
     const uniqAvoid = [...new Set(avoid)];
     if(uniqAvoid.length === 0){
       uniqAvoid.push("Changer trop de paramètres en même temps : y aller progressivement.");
     }
 
-    return { draw, drawNote, power, powerNote, nico, nicoNote, badges, uniqAvoid };
+    return { A, B, nico, nicoNote, badges, uniqAvoid };
   }
 
   function showResult(){
     const rec = recommend();
+    const tips = buildTips();
+    const bud = calcBudget();
+
     $("#resultBox").style.display = "block";
 
     // badges
-    const b = rec.badges.slice(0,6).map(x => `<span class="b ${x.c}">${x.t}</span>`).join("");
+    const b = rec.badges.slice(0,7).map(x => `<span class="b ${x.c}">${x.t}</span>`).join("");
     $("#badges").innerHTML = b || `<span class="b info">Recommandation</span>`;
 
-    $("#rDraw").textContent = rec.draw;
-    $("#rDrawNote").textContent = rec.drawNote;
+    // Options
+    $("#rA").textContent = `${rec.A.draw} • ${rec.A.power}`;
+    $("#rANote").textContent = rec.A.note;
 
-    $("#rPower").textContent = rec.power;
-    $("#rPowerNote").textContent = rec.powerNote;
+    $("#rB").textContent = `${rec.B.draw} • ${rec.B.power}`;
+    $("#rBNote").textContent = rec.B.note;
 
     $("#rNico").textContent = rec.nico;
     $("#rNicoNote").textContent = rec.nicoNote;
 
+    // Budget
+    if(bud){
+      $("#rBudget").textContent = `≈ ${fmt2(bud.perMonth)} € / mois • ≈ ${fmt2(bud.perYear)} € / an`;
+      $("#rBudgetNote").textContent = `≈ ${fmt2(bud.perDay)} € / jour (sur ${bud.cpd} cig/j estimées) • Base : 12,50 € / paquet`;
+    }else{
+      $("#rBudget").textContent = "—";
+      $("#rBudgetNote").textContent = "Base : 12,50 € / paquet (20 cig.)";
+    }
+
+    // tips
+    $("#tips").innerHTML = (tips.length ? tips : ["Objectif : un matériel confortable + dosage adapté."])
+      .map(t => `<li class="li"><div class="ic">💡</div><div class="tx">${t}</div></li>`)
+      .join("");
+
+    // avoid
     $("#avoid").innerHTML = rec.uniqAvoid
       .slice(0,5)
       .map(t => `<li class="li"><div class="ic">!</div><div class="tx">${t}</div></li>`)
@@ -810,18 +1029,31 @@
 
     // Copy summary
     $("#copyBtn").onclick = async () => {
+      const budTxt = bud
+        ? `Budget tabac (estim.) : ${fmt2(bud.perDay)} €/jour • ${fmt2(bud.perMonth)} €/mois • ${fmt2(bud.perYear)} €/an (12,50€/paquet)`
+        : `Budget tabac (estim.) : — (12,50€/paquet)`;
+
       const txt =
 `STOOM — Résumé orientation matériel
 - Consommation : ${state.cigs ? L.cigs[state.cigs] : "—"}
 - Sensation : ${state.feel ? L.feel[state.feel] : "—"}
+- Habitudes : ${state.habits.length ? state.habits.map(h => L.habits[h]).join(", ") : "—"}
+- Style : ${state.style ? L.style[state.style] : "—"}
 - Niveau : ${state.level ? L.level[state.level] : "—"}
 - Contexte : ${state.context ? L.context[state.context] : "—"}
-- Priorité : ${state.priority ? L.priority[state.priority] : "—"}
+- Priorité : ${state.priority || "—"}
 
-Recommandation :
-- Tirage : ${rec.draw}
-- Puissance : ${rec.power}
-- Nicotine (repère) : ${rec.nico}
+Recommandations :
+Option A (Sécurité) : ${rec.A.draw} • ${rec.A.power} — ${rec.A.note}
+Option B (Évolutive) : ${rec.B.draw} • ${rec.B.power} — ${rec.B.note}
+
+Nicotine (repère) : ${rec.nico}
+Note : ${rec.nicoNote}
+
+${budTxt}
+
+Tips :
+- ${buildTips().slice(0,5).join("\n- ")}
 
 À éviter :
 - ${rec.uniqAvoid.slice(0,3).join("\n- ")}
@@ -838,40 +1070,39 @@ Recommandation :
     $("#newBtn").onclick = resetAll;
   }
 
-  // --------- Rendering ----------
+  // ---------------- RENDER ----------------
   function render(){
     setSummary();
 
-    // Header per step
     const titles = {
-      1: ["Étape 1 — Profil fumeur", "Consommation + sensation recherchée. On vise un matériel qui évite la frustration."],
-      2: ["Étape 2 — Habitudes", "Contexte d’utilisation + expérience. On sécurise l’usage au quotidien."],
-      3: ["Étape 3 — Priorité", "On finalise : simplicité, autonomie, discrétion ou vapeur."],
-      4: ["Résultat — Recommandation STOOM", "Synthèse claire + points de vigilance. Le vendeur peut copier le résumé."]
+      1: ["Étape 1 — Profil fumeur", "Consommation + sensation recherchée. On pose une base solide et confortable."],
+      2: ["Étape 2 — Habitudes", "Moments clés + style de consommation. Ça génère les tips personnalisés."],
+      3: ["Étape 3 — Usage", "Expérience + contexte. On sécurise le quotidien : simplicité, autonomie, stabilité."],
+      4: ["Étape 4 — Priorité", "Ce qui compte le plus : simple, autonomie, discret, vapeur, hit, goût…"],
+      5: ["Résultat — Outil ultime STOOM", "Double recommandation + nicotine + budget tabac + tips + points à éviter."]
     };
     $("#panelTitle").textContent = titles[state.step][0];
     $("#panelSub").textContent   = titles[state.step][1];
 
     setProgress();
 
-    // Step content
     if(state.step === 1){
       mount(`
         <div class="q">Consommation <small>obligatoire</small></div>
         <div class="options">
-          ${cardOption({key:"cigs", value:"low", icon:"①", title:"– 10 / jour", desc:"Profil léger • objectif confort."})}
-          ${cardOption({key:"cigs", value:"mid", icon:"②", title:"10–15 / jour", desc:"Profil modéré • besoin stable."})}
-          ${cardOption({key:"cigs", value:"high", icon:"③", title:"15–20 / jour", desc:"Profil soutenu • vigilance dosage."})}
-          ${cardOption({key:"cigs", value:"veryhigh", icon:"④", title:"20+ / jour", desc:"Profil intense • priorité satiété."})}
+          ${cardOption({key:"cigs", value:"low", icon:"①", title:"– 10 / jour", desc:"Estimation budget sur ~8 cig/j."})}
+          ${cardOption({key:"cigs", value:"mid", icon:"②", title:"10–15 / jour", desc:"Estimation budget sur ~12,5 cig/j."})}
+          ${cardOption({key:"cigs", value:"high", icon:"③", title:"15–20 / jour", desc:"Estimation budget sur ~17,5 cig/j."})}
+          ${cardOption({key:"cigs", value:"veryhigh", icon:"④", title:"20+ / jour", desc:"Estimation budget sur ~25 cig/j."})}
         </div>
 
         <div style="height:14px"></div>
 
         <div class="q">Sensation recherchée <small>obligatoire</small></div>
         <div class="options">
-          ${cardOption({key:"feel", value:"cig", icon:"⟂", title:"Proche cigarette", desc:"Hit + tirage serré (MTL)."} )}
-          ${cardOption({key:"feel", value:"balanced", icon:"≈", title:"Équilibré", desc:"Polyvalent • bon compromis."} )}
-          ${cardOption({key:"feel", value:"vapeur", icon:"☁︎", title:"Plus de vapeur", desc:"RDL • vapeur maîtrisée."} )}
+          ${cardOption({key:"feel", value:"cig", icon:"⟂", title:"Proche cigarette", desc:"Tirage serré + hit, repère facile."} )}
+          ${cardOption({key:"feel", value:"balanced", icon:"≈", title:"Équilibré", desc:"Polyvalent, confortable au quotidien."} )}
+          ${cardOption({key:"feel", value:"vapeur", icon:"☁︎", title:"Plus de vapeur", desc:"Progressif, sans sacrifier le confort."} )}
           <div style="opacity:.0;pointer-events:none"></div>
         </div>
 
@@ -883,11 +1114,41 @@ Recommandation :
 
     if(state.step === 2){
       mount(`
+        <div class="q">Moments clés <small>choisir 1 à 4</small></div>
+        <div class="options">
+          ${cardOption({key:"habits", value:"coffee", icon:"☕", title:"Café", desc:"Tips dédiés café/cigarette."})}
+          ${cardOption({key:"habits", value:"aftermeal", icon:"🍽️", title:"Après repas", desc:"Tips dédiés après repas."})}
+          ${cardOption({key:"habits", value:"stress", icon:"😰", title:"Stress", desc:"Tips dédiés stress/tension."})}
+          ${cardOption({key:"habits", value:"car", icon:"🚗", title:"Voiture", desc:"Tips dédiés voiture."})}
+          ${cardOption({key:"habits", value:"breaks", icon:"⏱️", title:"Pauses courtes", desc:"Tips dédiés pauses travail."})}
+          ${cardOption({key:"habits", value:"morning", icon:"🌅", title:"Au réveil", desc:"Tips dédiés matin."})}
+          ${cardOption({key:"habits", value:"party", icon:"🍺", title:"Soirée", desc:"Tips dédiés soirée."})}
+          ${cardOption({key:"habits", value:"tv", icon:"📺", title:"TV / gaming", desc:"Tips dédiés surconsommation."})}
+        </div>
+
+        <div style="height:14px"></div>
+
+        <div class="q">Style de consommation <small>obligatoire</small></div>
+        <div class="options">
+          ${cardOption({key:"style", value:"ritual", icon:"🚬", title:"Une par une", desc:"Rituel : repère proche cigarette."})}
+          ${cardOption({key:"style", value:"chain", icon:"🔁", title:"En rafale", desc:"Enchaînement : vigilance irritation."})}
+          ${cardOption({key:"style", value:"fewpuffs", icon:"👄", title:"2–3 bouffées", desc:"Besoin d’un matériel “toujours prêt”."})}
+          ${cardOption({key:"style", value:"finish", icon:"🔥", title:"Je finis toujours", desc:"Vigilance sous-dosage."})}
+        </div>
+
+        ${navButtons()}
+      `);
+      wireNav();
+      $("#resultBox").style.display = "none";
+    }
+
+    if(state.step === 3){
+      mount(`
         <div class="q">Niveau d’expérience <small>obligatoire</small></div>
         <div class="options">
-          ${cardOption({key:"level", value:"beginner", icon:"★", title:"Débutant", desc:"On privilégie simple & fiable."})}
+          ${cardOption({key:"level", value:"beginner", icon:"★", title:"Débutant", desc:"Le plus simple possible."})}
           ${cardOption({key:"level", value:"intermediate", icon:"☆", title:"Déjà vapoté", desc:"On optimise confort/usage."})}
-          ${cardOption({key:"level", value:"advanced", icon:"✦", title:"Confirmé", desc:"On peut affiner les réglages."})}
+          ${cardOption({key:"level", value:"advanced", icon:"✦", title:"Confirmé", desc:"On peut affiner davantage."})}
           <div style="opacity:.0;pointer-events:none"></div>
         </div>
 
@@ -895,7 +1156,7 @@ Recommandation :
 
         <div class="q">Contexte principal <small>obligatoire</small></div>
         <div class="options">
-          ${cardOption({key:"context", value:"quick", icon:"⚡", title:"Pauses rapides", desc:"Besoin d’efficacité immédiate."})}
+          ${cardOption({key:"context", value:"quick", icon:"⚡", title:"Pauses rapides", desc:"Efficacité immédiate."})}
           ${cardOption({key:"context", value:"home", icon:"⌂", title:"Maison", desc:"Confort + autonomie tranquille."})}
           ${cardOption({key:"context", value:"car", icon:"⟟", title:"Voiture", desc:"Discrétion + stabilité airflow."})}
           ${cardOption({key:"context", value:"mixed", icon:"⟲", title:"Partout", desc:"Polyvalence avant tout."})}
@@ -907,14 +1168,18 @@ Recommandation :
       $("#resultBox").style.display = "none";
     }
 
-    if(state.step === 3){
+    if(state.step === 4){
       mount(`
         <div class="q">Votre priorité n°1 <small>obligatoire</small></div>
         <div class="options">
-          ${cardOption({key:"priority", value:"simple", icon:"✓", title:"Simple & fiable", desc:"Zéro prise de tête, efficace."})}
-          ${cardOption({key:"priority", value:"autonomie", icon:"🔋", title:"Autonomie", desc:"Tenir la journée sans stress."})}
-          ${cardOption({key:"priority", value:"discret", icon:"◻︎", title:"Discret", desc:"Compact, discret, pratique."})}
-          ${cardOption({key:"priority", value:"vapeur", icon:"☁", title:"Vapeur", desc:"Plus de densité (maîtrisée)."})}
+          ${cardOption({key:"priority", value:"simple", icon:"✓", title:"Simple & fiable", desc:"Zéro prise de tête."})}
+          ${cardOption({key:"priority", value:"autonomie", icon:"🔋", title:"Autonomie", desc:"Tenir la journée."})}
+          ${cardOption({key:"priority", value:"discret", icon:"◻︎", title:"Discret", desc:"Compact, pratique."})}
+          ${cardOption({key:"priority", value:"vapeur", icon:"☁", title:"Vapeur", desc:"Plus de densité (progressif)."})}
+          ${cardOption({key:"priority", value:"hit", icon:"⚡", title:"Hit", desc:"Sensation en gorge."})}
+          ${cardOption({key:"priority", value:"gout", icon:"👃", title:"Goût", desc:"Saveurs propres."})}
+          ${cardOption({key:"priority", value:"calme", icon:"😌", title:"Me calmer", desc:"Confort & stabilité."})}
+          <div style="opacity:.0;pointer-events:none"></div>
         </div>
 
         ${navButtons()}
@@ -923,12 +1188,12 @@ Recommandation :
       $("#resultBox").style.display = "none";
     }
 
-    if(state.step === 4){
+    if(state.step === 5){
       mount(`
         <div class="q">Synthèse prête <small>copiable</small></div>
         <div style="color:var(--muted);font-size:13px;line-height:1.45">
-          Le panneau de droite affiche la recommandation STOOM + les points de vigilance.  
-          Vous pouvez <strong>copier le résumé</strong> pour le noter sur une fiche client, un SMS, ou WhatsApp.
+          Le panneau de droite affiche la recommandation STOOM + budget tabac + tips personnalisés.  
+          Vous pouvez <strong>copier le résumé</strong> pour le noter, l’envoyer, ou le garder en suivi.
         </div>
         ${navButtons()}
       `);
@@ -936,7 +1201,7 @@ Recommandation :
       showResult();
     }
 
-    // button states (disabled style)
+    // disabled style
     document.querySelectorAll("button[disabled]").forEach(b=>{
       b.style.opacity = .55;
       b.style.cursor = "not-allowed";
@@ -947,6 +1212,8 @@ Recommandation :
     state.step = 1;
     state.cigs = null;
     state.feel = null;
+    state.habits = [];
+    state.style = null;
     state.level = null;
     state.context = null;
     state.priority = null;
@@ -956,7 +1223,7 @@ Recommandation :
 
   $("#resetBtn").onclick = resetAll;
 
-  // Init
+  // init
   render();
 </script>
 </body>
