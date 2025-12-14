@@ -76,7 +76,7 @@
 
     .btn{
       border:none; border-radius:16px; min-height:48px;
-      padding:12px 14px; font-weight:800; letter-spacing:.2px;
+      padding:12px 14px; font-weight:900; letter-spacing:.2px;
       color: rgba(255,255,255,.94);
       background: rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.14);
@@ -88,6 +88,11 @@
       background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(96,165,250,.75));
       border-color: rgba(255,255,255,.20);
       box-shadow: 0 14px 40px rgba(59,130,246,.18);
+    }
+    .btn.danger{
+      background: linear-gradient(135deg, rgba(239,68,68,.95), rgba(245,158,11,.55));
+      border-color: rgba(255,255,255,.20);
+      box-shadow: 0 14px 40px rgba(239,68,68,.10);
     }
     .btn.ghost{ background: rgba(255,255,255,.06); }
 
@@ -114,7 +119,7 @@
     .panelHead .title{ margin:0; font-size:15px; letter-spacing:.2px; }
     .panelHead .sub{
       margin:6px 0 0; color:var(--muted);
-      font-size:12.5px; line-height:1.35; max-width: 58ch;
+      font-size:12.5px; line-height:1.35; max-width: 66ch;
     }
 
     /* HOME GRID */
@@ -152,7 +157,7 @@
 
     .content{ padding:14px 16px 16px; }
 
-    /* Reuse your tool styles (options, etc.) */
+    /* Options */
     .q{
       margin:0 0 10px;
       font-size:14px;
@@ -160,7 +165,7 @@
       letter-spacing:.2px;
       display:flex; align-items:center; justify-content:space-between; gap:12px;
     }
-    .q small{ font-weight:700; color:var(--muted2); }
+    .q small{ font-weight:800; color:var(--muted2); }
 
     .options{
       display:grid;
@@ -187,7 +192,7 @@
       font-weight:900; color: rgba(255,255,255,.86);
     }
     .opt .txt{ min-width:0; }
-    .opt .txt .t{ font-weight:900; letter-spacing:.2px; font-size:14px; margin:0 0 4px; }
+    .opt .txt .t{ font-weight:1000; letter-spacing:.2px; font-size:14px; margin:0 0 4px; }
     .opt .txt .d{ margin:0; color:var(--muted); font-size:12.5px; line-height:1.25; }
 
     .opt.on{
@@ -202,7 +207,7 @@
 
     .navRow{ margin-top:14px; display:flex; gap:10px; align-items:center; justify-content:space-between; }
 
-    /* Side panel (summary/result) */
+    /* Side panel */
     .side{ padding:14px; }
     .summaryTitle{ margin:0 0 10px; font-size:14px; color: rgba(255,255,255,.88); }
     .mini{ display:grid; gap:10px; max-height:360px; overflow:auto; padding-right:4px; }
@@ -215,7 +220,7 @@
       padding:12px 12px;
     }
     .miniCard .k{ color:var(--muted2); font-size:12px; margin:0 0 6px; }
-    .miniCard .v{ margin:0; font-weight:900; font-size:13.5px; letter-spacing:.2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .miniCard .v{ margin:0; font-weight:1000; font-size:13.5px; letter-spacing:.2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
     .hint{ margin-top:12px; color:var(--muted); font-size:12.5px; line-height:1.35; }
 
@@ -232,17 +237,18 @@
       padding:8px 10px;
       border-radius:999px;
       font-size:12px;
-      font-weight:900;
+      font-weight:1000;
       border:1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.05);
     }
     .b.ok{ background: rgba(34,197,94,.10); border-color: rgba(34,197,94,.35); }
     .b.warn{ background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.40); }
+    .b.bad{ background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.40); }
     .b.info{ background: rgba(59,130,246,.12); border-color: rgba(59,130,246,.40); }
 
     .sectionTitle{
       margin: 14px 0 8px;
-      font-weight:900;
+      font-weight:1000;
       font-size:12.5px;
       color: rgba(255,255,255,.86);
       letter-spacing:.25px;
@@ -274,13 +280,38 @@
       border:1px solid rgba(255,255,255,.16);
       background: rgba(255,255,255,.06);
       flex:0 0 auto;
-      font-weight:900;
+      font-weight:1000;
       color: rgba(255,255,255,.86);
     }
     .li .tx{ min-width:0; color: rgba(255,255,255,.86); font-size:12.8px; line-height:1.25; }
 
     .tools{ display:flex; gap:10px; margin-top:12px; }
     .tools .btn{ flex:1; }
+
+    /* Inputs */
+    .field{
+      display:grid;
+      gap:8px;
+      margin-top: 10px;
+    }
+    .input{
+      width:100%;
+      min-height: 48px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
+      outline:none;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+    .input::placeholder{ color: rgba(255,255,255,.40); font-weight:700; }
+    .help{
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.35;
+    }
 
     /* Pages */
     .page{ display:none; }
@@ -301,7 +332,7 @@
         <div class="logo" aria-hidden="true"></div>
         <div style="min-width:0">
           <h1>STOOM — Hub outils</h1>
-          <p>Tablette boutique • accès rapide aux outils vendeurs</p>
+          <p>Tablette boutique • parcours client • SAV • sevrage • DIY</p>
         </div>
       </div>
 
@@ -309,31 +340,40 @@
         <div class="pill"><span class="dot"></span>Prêt en boutique</div>
         <button class="btn ghost" id="homeBtn" type="button">Accueil</button>
         <button class="btn ghost" id="resetBtn" type="button" style="display:none;">Réinitialiser</button>
+        <button class="btn ghost" id="resetSavBtn" type="button" style="display:none;">Réinit SAV</button>
       </div>
     </div>
 
     <div class="grid">
-      <!-- Main -->
+      <!-- MAIN -->
       <section class="panel" aria-label="Zone principale">
         <header class="panelHead">
           <div>
             <h2 class="title" id="panelTitle">Accueil</h2>
-            <p class="sub" id="panelSub">Choisissez un outil. Interface pensée pour un usage en boutique.</p>
+            <p class="sub" id="panelSub">Choisissez un outil. Interface pensée pour un usage fluide en boutique.</p>
           </div>
           <div style="text-align:right;">
-            <div style="font-weight:900;font-size:12px;color:var(--muted2);">Mode</div>
+            <div style="font-weight:1000;font-size:12px;color:var(--muted2);">Mode</div>
             <div style="font-weight:1000;font-size:16px;" id="modeTag">Hub</div>
           </div>
         </header>
 
-        <!-- HOME PAGE -->
+        <!-- HOME -->
         <div class="page on" id="page-home">
           <div class="homeGrid">
             <div class="tile" role="button" tabindex="0" data-go="material">
               <div class="ico">⚡</div>
               <div>
                 <p class="t">Choisir le matériel</p>
-                <p class="d">Parcours vendeur + recommandations + budget tabac + conseils.</p>
+                <p class="d">Parcours vendeur + recommandations + budget tabac + conseils personnalisés.</p>
+              </div>
+            </div>
+
+            <div class="tile" role="button" tabindex="0" data-go="sav">
+              <div class="ico">🛠️</div>
+              <div>
+                <p class="t">Mode SAV (diagnostic)</p>
+                <p class="d">Problèmes courants → solutions guidées + plan copiable pour le client.</p>
               </div>
             </div>
 
@@ -341,67 +381,179 @@
               <div class="ico">🧪</div>
               <div>
                 <p class="t">Faire mon DIY</p>
-                <p class="d">Accès au calculateur DIY et repères de préparation.</p>
+                <p class="d">Accès direct au calculateur DIY STOOM (GitHub Pages).</p>
               </div>
             </div>
 
             <div class="tile" role="button" tabindex="0" data-go="quicktips">
               <div class="ico">💡</div>
               <div>
-                <p class="t">Tips sevrage / nicotine</p>
-                <p class="d">Rappels simples : dosage, confort, éviter la reprise.</p>
+                <p class="t">Sevrage & Nicotine</p>
+                <p class="d">Mémo “décision rapide” : sous-dosage, confort, plan vers 0 mg.</p>
+              </div>
+            </div>
+
+            <div class="tile" role="button" tabindex="0" data-go="seller">
+              <div class="ico">🧠</div>
+              <div>
+                <p class="t">Mode vendeur</p>
+                <p class="d">Trame d’entretien, repères MTL/RDL, erreurs à éviter, check-list.</p>
               </div>
             </div>
 
             <div class="tile" role="button" tabindex="0" data-go="about">
               <div class="ico">ℹ️</div>
               <div>
-                <p class="t">Mode vendeur</p>
-                <p class="d">Mémo : règles STOOM, puissance/nicotine, bonnes pratiques.</p>
+                <p class="t">Références</p>
+                <p class="d">Rappels simples : logique de sevrage, posture, continuité, suivi.</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- DIY PAGE -->
+        <!-- DIY -->
         <div class="page" id="page-diy">
           <div class="content">
-            <div class="q">DIY <small>accès rapide</small></div>
+            <div class="q">DIY <small>accès direct</small></div>
             <div style="color:var(--muted);font-size:13px;line-height:1.45">
-              Accès direct au calculateur DIY STOOM.
+              Ouvrir le calculateur DIY STOOM dans un nouvel onglet.
               <div style="height:12px"></div>
               <button class="btn primary" type="button" id="openDiyBtn">Ouvrir le calculateur DIY</button>
               <div style="height:10px"></div>
-              <div style="font-size:12.5px;color:var(--muted2);">
-                Astuce : si la tablette bloque les popups, utilisez Chrome et autorisez l’ouverture de nouveaux onglets.
+              <div class="help">
+                Astuce : sur certaines tablettes, privilégier Chrome si l’ouverture d’onglet est bloquée.
               </div>
             </div>
           </div>
         </div>
 
-        <!-- QUICKTIPS PAGE -->
+        <!-- QUICKTIPS -->
         <div class="page" id="page-quicktips">
           <div class="content">
-            <div class="q">Tips sevrage / nicotine <small>mémo</small></div>
+            <div class="q">Sevrage & Nicotine <small>mémo vendeur (décision rapide)</small></div>
+
+            <div class="sectionTitle">Principes clés</div>
             <ul class="list">
-              <li class="li"><div class="ic">✓</div><div class="tx"><strong>Priorité :</strong> éviter la frustration (c’est le déclencheur n°1 des reprises).</div></li>
-              <li class="li"><div class="ic">✓</div><div class="tx"><strong>Nicotine :</strong> ajuster le dosage avant d’augmenter la puissance.</div></li>
-              <li class="li"><div class="ic">✓</div><div class="tx"><strong>Progressivité :</strong> si objectif 0 mg, proposer une baisse graduelle.</div></li>
-              <li class="li"><div class="ic">!</div><div class="tx"><strong>Vigilance :</strong> puissance élevée + dosage élevé = inconfort (irritations).</div></li>
-              <li class="li"><div class="ic">!</div><div class="tx"><strong>Stabilité :</strong> un set-up simple et fiable vaut mieux qu’un set-up “performant” instable.</div></li>
+              <li class="li"><div class="ic">✓</div><div class="tx"><strong>Objectif prioritaire :</strong> confort et continuité (éviter la frustration → éviter la reprise).</div></li>
+              <li class="li"><div class="ic">✓</div><div class="tx"><strong>Nicotine élevée</strong> → tirage plutôt <strong>serré (MTL)</strong> + puissance <strong>modérée</strong>.</div></li>
+              <li class="li"><div class="ic">✓</div><div class="tx"><strong>Tirage plus aérien / puissance plus haute</strong> → on baisse souvent la nicotine pour rester confortable.</div></li>
+              <li class="li"><div class="ic">✓</div><div class="tx"><strong>Une modification à la fois :</strong> on ajuste d’abord le dosage, puis le tirage, puis la puissance.</div></li>
             </ul>
+
+            <div class="sectionTitle">Diagnostic express</div>
+            <div class="kpis">
+              <div class="kpi">
+                <p class="k">Sous-dosage probable</p>
+                <p class="v">“Ça ne cale pas”</p>
+                <p class="s">Envies persistantes, irritabilité, cigarettes “en plus”, besoin de vaper sans satisfaction.</p>
+              </div>
+              <div class="kpi">
+                <p class="k">Surdosage / inconfort</p>
+                <p class="v">“Trop fort”</p>
+                <p class="s">Hit trop marqué, gorge irritée, nausée, maux de tête, sensation désagréable.</p>
+              </div>
+            </div>
+
+            <div class="sectionTitle">Que faire si…</div>
+            <ul class="list">
+              <li class="li"><div class="ic">→</div><div class="tx"><strong>Si sous-dosage :</strong> augmenter légèrement la nicotine <em>ou</em> resserrer le tirage. Éviter de compenser par la puissance.</div></li>
+              <li class="li"><div class="ic">→</div><div class="tx"><strong>Si surdosage / irritation :</strong> baisser la nicotine <em>ou</em> réduire la puissance <em>ou</em> ouvrir légèrement l’airflow. On cherche d’abord le confort.</div></li>
+              <li class="li"><div class="ic">→</div><div class="tx"><strong>Si envie de 0 mg “tout de suite” :</strong> proposer une baisse progressive, avec alternance (stabilité → transition → 0).</div></li>
+              <li class="li"><div class="ic">→</div><div class="tx"><strong>Si moments à risque (café / stress / soirée) :</strong> prévoir un dosage “sécurisant” dédié à ces moments.</div></li>
+            </ul>
+
+            <div class="sectionTitle">Plan vers 0 mg (professionnel)</div>
+            <ul class="list">
+              <li class="li"><div class="ic">1</div><div class="tx"><strong>Stabilisation :</strong> 7–14 jours sur un dosage confortable (aucune frustration).</div></li>
+              <li class="li"><div class="ic">2</div><div class="tx"><strong>Alternance :</strong> 6/3 mg ou 6/0 mg sur certains créneaux de la journée.</div></li>
+              <li class="li"><div class="ic">3</div><div class="tx"><strong>Descente complète :</strong> quand les envies sont rares et facilement gérables.</div></li>
+              <li class="li"><div class="ic">💬</div><div class="tx"><strong>Phrase :</strong> “On vise 0 mg, mais l’objectif prioritaire c’est de ne pas revenir au tabac. On ajuste au confort.”</div></li>
+            </ul>
+
+            <div class="tools">
+              <button class="btn ghost" id="copyTipsBtn" type="button">Copier la fiche</button>
+              <button class="btn primary" type="button" onclick="showPage('home')">Retour accueil</button>
+            </div>
           </div>
         </div>
 
-        <!-- ABOUT / MEMO PAGE -->
+        <!-- SELLER -->
+        <div class="page" id="page-seller">
+          <div class="content">
+            <div class="q">Mode vendeur <small>trame + repères + check-list</small></div>
+
+            <div class="sectionTitle">Trame d’entretien (5 questions)</div>
+            <ul class="list">
+              <li class="li"><div class="ic">1</div><div class="tx"><strong>Combien / jour ?</strong> Et quels moments sont les plus difficiles (réveil, café, après repas, stress, voiture) ?</div></li>
+              <li class="li"><div class="ic">2</div><div class="tx"><strong>Type de cigarette ?</strong> (forte/légère/menthol) + niveau de hit attendu.</div></li>
+              <li class="li"><div class="ic">3</div><div class="tx"><strong>Contrainte principale ?</strong> (discret, autonomie, simplicité, vapeur, goût).</div></li>
+              <li class="li"><div class="ic">4</div><div class="tx"><strong>Déjà testé la vape ?</strong> Qu’est-ce qui n’allait pas (trop faible, trop fort, fuite, goût) ?</div></li>
+              <li class="li"><div class="ic">5</div><div class="tx"><strong>Objectif :</strong> arrêt total immédiat ou transition progressive (on adapte le plan).</div></li>
+            </ul>
+
+            <div class="sectionTitle">Repères rapides</div>
+            <div class="kpis">
+              <div class="kpi">
+                <p class="k">MTL (tirage serré)</p>
+                <p class="v">Sevrage efficace</p>
+                <p class="s">Compatible avec dosages plus élevés, confortable, stable.</p>
+              </div>
+              <div class="kpi">
+                <p class="k">RDL léger (semi-aérien)</p>
+                <p class="v">Polyvalent</p>
+                <p class="s">Compromis sensations/vapeur, dosage modéré.</p>
+              </div>
+              <div class="kpi">
+                <p class="k">DL (aérien / puissant)</p>
+                <p class="v">Plutôt ensuite</p>
+                <p class="s">Souvent dosage plus bas. À proposer quand le client est stable.</p>
+              </div>
+              <div class="kpi">
+                <p class="k">Règle d’or</p>
+                <p class="v">Confort avant performance</p>
+                <p class="s">On évite puissance élevée + nicotine élevée en même temps.</p>
+              </div>
+            </div>
+
+            <div class="sectionTitle">Repères dosage (STOOM)</div>
+            <ul class="list">
+              <li class="li"><div class="ic">•</div><div class="tx"><strong>5–10 cig/j</strong> : 3 mg ou 6 mg</div></li>
+              <li class="li"><div class="ic">•</div><div class="tx"><strong>10–15 cig/j</strong> : 6 mg ou 12 mg</div></li>
+              <li class="li"><div class="ic">•</div><div class="tx"><strong>15–20 cig/j</strong> : 10 mg en sel de nicotine (selon confort)</div></li>
+              <li class="li"><div class="ic">•</div><div class="tx"><strong>25+ cig/j</strong> : 20 mg en sel de nicotine (selon confort)</div></li>
+            </ul>
+
+            <div class="sectionTitle">Erreurs fréquentes</div>
+            <ul class="list">
+              <li class="li"><div class="ic">!</div><div class="tx"><strong>Sous-dosage “par prudence”</strong> → envies persistantes. <strong>Correctif :</strong> viser le confort, puis baisser progressivement.</div></li>
+              <li class="li"><div class="ic">!</div><div class="tx"><strong>Matériel trop puissant au démarrage</strong> → inconfort/abandon. <strong>Correctif :</strong> base simple/stable, évolution ensuite.</div></li>
+              <li class="li"><div class="ic">!</div><div class="tx"><strong>Trop de changements d’un coup</strong>. <strong>Correctif :</strong> un paramètre à la fois.</div></li>
+            </ul>
+
+            <div class="sectionTitle">Check-list fin de vente</div>
+            <ul class="list">
+              <li class="li"><div class="ic">✓</div><div class="tx">Le client sait <strong>recharger</strong>, <strong>remplir</strong>, et <strong>changer la résistance/pod</strong>.</div></li>
+              <li class="li"><div class="ic">✓</div><div class="tx">Dosage, tirage, autonomie : <strong>validés</strong> et cohérents.</div></li>
+              <li class="li"><div class="ic">✓</div><div class="tx">Plan d’ajustement : quoi faire si <strong>trop faible</strong> / <strong>trop fort</strong>.</div></li>
+              <li class="li"><div class="ic">✓</div><div class="tx">Point de contrôle : “revenez si besoin, on ajuste rapidement”.</div></li>
+            </ul>
+
+            <div class="tools">
+              <button class="btn ghost" id="copySellerBtn" type="button">Copier le mémo</button>
+              <button class="btn primary" type="button" onclick="showPage('home')">Retour accueil</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ABOUT -->
         <div class="page" id="page-about">
           <div class="content">
-            <div class="q">Mémo vendeur <small>STOOM</small></div>
+            <div class="q">Références <small>rappels utiles</small></div>
             <ul class="list">
-              <li class="li"><div class="ic">①</div><div class="tx"><strong>Dosage élevé</strong> → matériel plutôt <strong>peu puissant</strong> (confort).</div></li>
-              <li class="li"><div class="ic">②</div><div class="tx"><strong>Dosage faible</strong> → matériel peut être <strong>plus puissant</strong> (si usage maîtrisé).</div></li>
-              <li class="li"><div class="ic">③</div><div class="tx"><strong>Conseil :</strong> poser les questions (habitudes, moments clés, contraintes) avant de proposer.</div></li>
-              <li class="li"><div class="ic">④</div><div class="tx"><strong>Objectif :</strong> confort + régularité + continuité → sevrage durable.</div></li>
+              <li class="li"><div class="ic">✓</div><div class="tx"><strong>Posture :</strong> écouter, reformuler, proposer, sécuriser (pas de discours culpabilisant).</div></li>
+              <li class="li"><div class="ic">✓</div><div class="tx"><strong>Sevrage :</strong> la continuité prime. Un client stable = client qui progresse.</div></li>
+              <li class="li"><div class="ic">✓</div><div class="tx"><strong>Suivi :</strong> proposer un ajustement rapide (dosage/tirage) plutôt qu’un changement complet.</div></li>
+              <li class="li"><div class="ic">✓</div><div class="tx"><strong>SAV :</strong> diagnostic simple, actions hiérarchisées, et plan clair pour le client.</div></li>
             </ul>
           </div>
         </div>
@@ -410,16 +562,21 @@
         <div class="page" id="page-material">
           <div class="content" id="materialRoot"></div>
         </div>
+
+        <!-- SAV TOOL PAGE -->
+        <div class="page" id="page-sav">
+          <div class="content" id="savRoot"></div>
+        </div>
       </section>
 
-      <!-- Side -->
+      <!-- SIDE -->
       <aside class="panel" aria-label="Résumé">
         <div class="side">
           <h3 class="summaryTitle">Résumé</h3>
 
           <div id="sideHubHint" style="color:var(--muted);font-size:13px;line-height:1.45">
             Sélectionnez un outil depuis l’accueil.<br><br>
-            💡 Astuce : gardez ce hub en favori sur la tablette.
+            💡 Astuce : ce hub standardise vos conseils (même qualité pour chaque vendeur).
           </div>
 
           <!-- MATERIAL SUMMARY -->
@@ -434,7 +591,7 @@
               <div class="miniCard"><p class="k">Priorité</p><p class="v" id="sPriority">—</p></div>
             </div>
 
-            <p class="hint">💡 En boutique : stabilité d’abord (tirage + dosage adaptés), puis évolution si besoin.</p>
+            <p class="hint">💡 En boutique : stabilité d’abord (tirage + dosage adaptés), puis évolution si le client le souhaite.</p>
 
             <div class="result" id="resultBox" style="display:none;">
               <div class="badges" id="badges"></div>
@@ -478,30 +635,65 @@
               </div>
             </div>
           </div>
+
+          <!-- SAV SUMMARY -->
+          <div id="sideSav" style="display:none;">
+            <div class="mini" style="margin-top:10px;">
+              <div class="miniCard"><p class="k">Problème(s)</p><p class="v" id="savSProb">—</p></div>
+              <div class="miniCard"><p class="k">Depuis quand</p><p class="v" id="savSTime">—</p></div>
+              <div class="miniCard"><p class="k">Changement récent</p><p class="v" id="savSChange">—</p></div>
+              <div class="miniCard"><p class="k">Type d’usage</p><p class="v" id="savSUse">—</p></div>
+            </div>
+
+            <div class="result" id="savResult" style="display:none;">
+              <div class="badges" id="savBadges"></div>
+
+              <div class="sectionTitle">Plan d’action (priorité)</div>
+              <ul class="list" id="savPlan"></ul>
+
+              <div class="sectionTitle">À vérifier / à éviter</div>
+              <ul class="list" id="savAvoid"></ul>
+
+              <div class="tools">
+                <button class="btn ghost" id="savCopyBtn" type="button">Copier le plan SAV</button>
+                <button class="btn primary" id="savNewBtn" type="button">Nouveau SAV</button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </aside>
     </div>
   </div>
 
 <script>
-  // ---------------- Simple Router ----------------
-  const pages = ["home","material","diy","quicktips","about"];
+  // =========================
+  // Router
+  // =========================
+  const pages = ["home","material","sav","diy","quicktips","seller","about"];
+
   function showPage(name){
     pages.forEach(p => document.getElementById("page-"+p).classList.toggle("on", p===name));
 
-    const isTool = (name === "material");
-    document.getElementById("modeTag").textContent = isTool ? "Outil" : "Hub";
-    document.getElementById("resetBtn").style.display = isTool ? "inline-block" : "none";
+    const isMaterial = (name === "material");
+    const isSav = (name === "sav");
 
-    document.getElementById("sideHubHint").style.display = isTool ? "none" : "block";
-    document.getElementById("sideMaterial").style.display = isTool ? "block" : "none";
+    document.getElementById("modeTag").textContent = (isMaterial || isSav) ? "Outil" : "Hub";
+    document.getElementById("resetBtn").style.display = isMaterial ? "inline-block" : "none";
+    document.getElementById("resetSavBtn").style.display = isSav ? "inline-block" : "none";
+
+    document.getElementById("sideHubHint").style.display = (isMaterial || isSav) ? "none" : "block";
+    document.getElementById("sideMaterial").style.display = isMaterial ? "block" : "none";
+    document.getElementById("sideSav").style.display = isSav ? "block" : "none";
 
     const titles = {
-      home: ["Accueil", "Choisissez un outil. Interface pensée pour un usage en boutique."],
+      home: ["Accueil", "Choisissez un outil. Interface pensée pour un usage fluide en boutique."],
       material: ["Choisir le matériel", "Parcours vendeur : recommandations cohérentes + budget tabac + conseils."],
-      diy: ["Faire mon DIY", "Accès au calculateur DIY et repères de préparation."],
-      quicktips: ["Tips sevrage / nicotine", "Mémo rapide : dosage, confort, stabilité."],
-      about: ["Mode vendeur", "Rappels STOOM : règles simples et efficaces."]
+      sav: ["Mode SAV (diagnostic)", "Problèmes courants → causes probables → solutions hiérarchisées."],
+      diy: ["Faire mon DIY", "Accès direct au calculateur DIY STOOM."],
+      quicktips: ["Sevrage & Nicotine", "Mémo décision rapide : confort, dosage, progression."],
+      seller: ["Mode vendeur", "Trame d’entretien, repères, erreurs à éviter, check-list."],
+      about: ["Références", "Rappels utiles pour la continuité et le suivi."]
     };
     document.getElementById("panelTitle").textContent = titles[name][0];
     document.getElementById("panelSub").textContent = titles[name][1];
@@ -510,11 +702,14 @@
       const rb = document.getElementById("resultBox");
       if(rb) rb.style.display = "none";
     }
+    if(name !== "sav"){
+      const sr = document.getElementById("savResult");
+      if(sr) sr.style.display = "none";
+    }
   }
 
   document.getElementById("homeBtn").onclick = () => showPage("home");
 
-  // Home tiles
   document.querySelectorAll(".tile").forEach(t => {
     const go = t.dataset.go;
     const handler = () => showPage(go);
@@ -522,11 +717,60 @@
     t.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); handler(); }});
   });
 
-  // ✅ DIY external link (BRANCHÉ)
+  // =========================
+  // DIY link
+  // =========================
   const DIY_URL = "https://stoom63.github.io/CALCULATEUR-DIY-STOOM/";
   document.getElementById("openDiyBtn").onclick = () => window.open(DIY_URL, "_blank");
 
-  // ---------------- MATERIAL TOOL (embedded) ----------------
+  // =========================
+  // Clipboard helper
+  // =========================
+  const copyToClipboard = async (text, btn) => {
+    try{
+      await navigator.clipboard.writeText(text);
+      if(btn){
+        const old = btn.textContent;
+        btn.textContent = "Copié ✓";
+        setTimeout(()=>btn.textContent = old, 1200);
+      }
+    }catch(e){
+      alert("Copie impossible sur cet appareil. (Astuce : utiliser Chrome)");
+    }
+  };
+
+  // Copy buttons (tips + seller)
+  document.addEventListener("click", (e) => {
+    if(e.target && e.target.id === "copyTipsBtn"){
+      const t =
+`STOOM — Sevrage & Nicotine (mémo)
+- Priorité : confort et continuité (éviter frustration → éviter reprise)
+- Nicotine élevée : MTL + puissance modérée
+- Tirage/puissance plus élevés : nicotine souvent plus basse
+- Une modification à la fois (dosage → tirage → puissance)
+
+Sous-dosage : "ça ne cale pas", envies persistantes
+Surdosage : "trop fort", irritation, nausée
+
+Plan vers 0 mg : stabilisation → alternance → descente complète
+Phrase : "On vise 0 mg, mais l’objectif prioritaire c’est de ne pas revenir au tabac."`;
+      copyToClipboard(t, e.target);
+    }
+
+    if(e.target && e.target.id === "copySellerBtn"){
+      const t =
+`STOOM — Mémo vendeur
+Trame : conso/j + moments clés + type de cigarette + contrainte + essais + objectif.
+Repères : MTL = dosages plus élevés possibles ; RDL = modéré ; DL = plutôt bas.
+Règle d’or : confort avant performance.
+Check-list : remplissage/recharge/changement résistance + plan d’ajustement + point de contrôle.`;
+      copyToClipboard(t, e.target);
+    }
+  });
+
+  // =========================
+  // MATERIAL TOOL
+  // =========================
   const state = {
     step: 1,
     cigs: null,
@@ -682,7 +926,7 @@
 
     if(h.has("coffee")) tips.push("Café : vapoter 1–2 minutes avant. Objectif : anticiper l’envie et stabiliser la sensation.");
     if(h.has("aftermeal")) tips.push("Après repas : rester sur une vape confortable 2–3 minutes. La régularité suffit.");
-    if(h.has("stress")) tips.push("Stress : rapprocher les bouffées. Si besoin, ajuster la nicotine plutôt que la puissance.");
+    if(h.has("stress")) tips.push("Stress : rapprocher les bouffées. Si nécessaire, ajuster la nicotine plutôt que la puissance.");
     if(h.has("car")) tips.push("Voiture : privilégier un matériel discret, tirage plutôt serré et airflow stable.");
     if(h.has("breaks")) tips.push("Pauses courtes : tirage serré + dosage confortable + autonomie sécurisante.");
     if(h.has("morning")) tips.push("Réveil : éviter le sous-dosage. Mieux vaut un dosage confortable qu’une montée en puissance.");
@@ -714,7 +958,7 @@
     if(state.cigs === "high"){
       nico = "10–12 mg/ml (ou 10 mg sels selon confort)";
       badges.push({t:"Profil soutenu", c:"warn"});
-      A.draw="MTL (serré / restrictif)"; A.power="8–16W • 1.0–1.4Ω"; A.note="Priorité : satiété + confort.";
+      A.draw="MTL (serré / restrictif)"; A.power="8–16W • 1.0–1.4Ω"; A.note="Priorité : satiété et confort.";
       avoid.push("Puissance trop élevée avec nicotine forte (inconfort).");
     }
     if(state.cigs === "veryhigh"){
@@ -730,7 +974,7 @@
     if(state.feel === "vapeur"){ badges.push({t:"Densité maîtrisée", c:"info"}); avoid.push("Nicotine trop élevée sur tirage trop aérien."); }
     if(state.level === "beginner"){ badges.push({t:"Débutant", c:"ok"}); avoid.push("Matériel complexe au départ."); }
     if(state.context === "quick"){ badges.push({t:"Pauses rapides", c:"info"}); avoid.push("Autonomie trop faible (panne en journée)."); }
-    if(state.context === "car"){ badges.push({t:"Voiture", c:"info"}); avoid.push("Airflow trop ouvert (usage moins pratique)."); }
+    if(state.context === "car"){ badges.push({t:"Voiture", c:"info"}); avoid.push("Airflow trop ouvert (moins pratique)."); }
 
     if(state.priority === "simple"){ badges.push({t:"Simple", c:"ok"}); A.note="Le plus simple et le plus fiable pour démarrer."; }
     if(state.priority === "discret"){ badges.push({t:"Discret", c:"info"}); avoid.push("Format trop encombrant si besoin de discrétion."); }
@@ -767,7 +1011,7 @@
       $("#charges").innerHTML = `<li class="li"><div class="ic">€</div><div class="tx">Sélectionnez la consommation pour afficher le repère “charges fixes”.</div></li>`;
     }
 
-    const tipsArr = tips.length ? tips : ["Objectif : confort + régularité. Ajuster progressivement si nécessaire."];
+    const tipsArr = tips.length ? tips : ["Objectif : confort et régularité. Ajuster progressivement si nécessaire."];
     $("#tips").innerHTML = tipsArr.map(t => `<li class="li"><div class="ic">💡</div><div class="tx">${t}</div></li>`).join("");
     $("#avoid").innerHTML = rec.uniqAvoid.slice(0,5).map(t => `<li class="li"><div class="ic">!</div><div class="tx">${t}</div></li>`).join("");
 
@@ -789,7 +1033,7 @@ Option B (Évolutive) : ${rec.B.draw} • ${rec.B.power} — ${rec.B.note}
 Nicotine (repère) : ${rec.nico}
 Note : ${rec.nicoNote}
 
-Budget tabac estimé : ${bud ? `${fmt2(bud.perDay)} €/jour • ${fmt2(bud.perMonth)} €/mois • ${fmt2(bud.perYear)} €/an` : "—"} (paquet 12,50€)
+Budget tabac estimé : ${bud ? `${fmt2(bud.perDay)} €/jour • ${fmt2(bud.perMonth)} €/mois • ${fmt2(bud.perYear)} €/an` : "—"} (paquet 12,50 €)
 ${eqTxt}
 
 Conseils :
@@ -798,13 +1042,7 @@ Conseils :
 Points de vigilance :
 - ${rec.uniqAvoid.slice(0,3).join("\n- ")}
 `;
-      try{
-        await navigator.clipboard.writeText(txt);
-        $("#copyBtn").textContent = "Copié ✓";
-        setTimeout(()=>$("#copyBtn").textContent="Copier le résumé", 1200);
-      }catch(e){
-        alert("Copie impossible sur cet appareil. (Astuce : utiliser Chrome)");
-      }
+      copyToClipboard(txt, $("#copyBtn"));
     };
 
     $("#newBtn").onclick = resetAll;
@@ -873,8 +1111,8 @@ Points de vigilance :
       mountTool(header("Étape 3 — Usage", "Expérience + contexte.") + `
         <div class="q">Niveau d’expérience <small>obligatoire</small></div>
         <div class="options">
-          ${opt({key:"level", value:"beginner", icon:"★", title:"Débutant", desc:"On privilégie simple & stable."})}
-          ${opt({key:"level", value:"intermediate", icon:"☆", title:"Déjà vapoté", desc:"On optimise confort/usage."})}
+          ${opt({key:"level", value:"beginner", icon:"★", title:"Débutant", desc:"On privilégie simple et stable."})}
+          ${opt({key:"level", value:"intermediate", icon:"☆", title:"Déjà vapoté", desc:"Optimisation confort/usage."})}
           ${opt({key:"level", value:"advanced", icon:"✦", title:"Confirmé", desc:"Affinage possible."})}
           <div style="opacity:.0;pointer-events:none"></div>
         </div>
@@ -922,11 +1160,7 @@ Points de vigilance :
     }
 
     wireNav();
-
-    root.querySelectorAll("button[disabled]").forEach(b=>{
-      b.style.opacity = .55;
-      b.style.cursor = "not-allowed";
-    });
+    root.querySelectorAll("button[disabled]").forEach(b=>{ b.style.opacity = .55; b.style.cursor="not-allowed"; });
   }
 
   function resetAll(){
@@ -939,14 +1173,365 @@ Points de vigilance :
 
   document.getElementById("resetBtn").onclick = resetAll;
 
-  // Start on home
+  // =========================
+  // SAV TOOL
+  // =========================
+  const sav = {
+    step: 1,
+    problems: [], // multi
+    time: null,   // now, today, week, long
+    change: null, // coil, liquid, settings, none
+    usage: null,  // normal, intensive, occasional
+  };
+
+  const SAV_L = {
+    problems: {
+      leak: "Fuite / glouglou",
+      burnt: "Goût de brûlé",
+      nogusto: "Pas assez de goût",
+      cough: "Toux / irritation",
+      nohit: "Hit trop faible",
+      toohit: "Hit trop fort",
+      nodraw: "Ne déclenche pas / pas de vapeur",
+      battery: "Batterie / autonomie",
+      relapse: "Envie de cigarette / reprise"
+    },
+    time: {
+      now: "Tout de suite / depuis le changement",
+      today: "Depuis aujourd’hui",
+      week: "Depuis quelques jours",
+      long: "Depuis longtemps / récurrent"
+    },
+    change: {
+      coil: "Résistance / cartouche",
+      liquid: "Liquide",
+      settings: "Réglages / airflow",
+      none: "Rien (à ma connaissance)"
+    },
+    usage: {
+      normal: "Usage normal",
+      intensive: "Usage intensif",
+      occasional: "Usage occasionnel"
+    }
+  };
+
+  const savRoot = document.getElementById("savRoot");
+
+  function savIsOn(key, value){
+    if(Array.isArray(sav[key])) return sav[key].includes(value);
+    return sav[key] === value;
+  }
+
+  function savOpt({key, value, icon, title, desc}){
+    const on = savIsOn(key, value) ? " on" : "";
+    return `
+      <div class="opt${on}" role="button" tabindex="0" data-skey="${key}" data-svalue="${value}">
+        <div class="icon">${icon}</div>
+        <div class="txt">
+          <p class="t">${title}</p>
+          <p class="d">${desc || ""}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function savMount(html){
+    savRoot.innerHTML = html;
+    savRoot.querySelectorAll(".opt").forEach(el => {
+      const handler = () => {
+        const key = el.dataset.skey;
+        const val = el.dataset.svalue;
+        if(key === "problems") return savToggleProblem(val);
+        savPick(key, val);
+      };
+      el.addEventListener("click", handler);
+      el.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); handler(); }});
+    });
+
+    const back = document.getElementById("savBackBtn");
+    const next = document.getElementById("savNextBtn");
+    if(back) back.onclick = () => { sav.step = Math.max(1, sav.step-1); savRender(); };
+    if(next) next.onclick = () => {
+      if(sav.step < 3){ sav.step += 1; savRender(); }
+      else{ sav.step = 1; savRender(); }
+    };
+  }
+
+  function savToggleProblem(v){
+    const i = sav.problems.indexOf(v);
+    if(i >= 0) sav.problems.splice(i,1);
+    else sav.problems.push(v);
+    if(sav.problems.length > 3) sav.problems.shift();
+    savRender();
+    savAutoAdvance();
+  }
+
+  function savPick(key, val){
+    sav[key] = val;
+    savRender();
+    savAutoAdvance();
+  }
+
+  function savStepComplete(n){
+    if(n === 1) return sav.problems.length >= 1;
+    if(n === 2) return !!(sav.time && sav.change && sav.usage);
+    if(n === 3) return true;
+    return false;
+  }
+
+  function savAutoAdvance(){
+    if(sav.step === 1 && savStepComplete(1)){ sav.step = 2; savRender(); return; }
+    if(sav.step === 2 && savStepComplete(2)){ sav.step = 3; savRender(); return; }
+  }
+
+  function savNav(){
+    const backDisabled = sav.step === 1;
+    const nextDisabled = (sav.step === 1 && !savStepComplete(1)) || (sav.step === 2 && !savStepComplete(2));
+    const nextLabel = sav.step < 3 ? "Continuer" : "Revoir";
+    return `
+      <div class="navRow">
+        <button class="btn ghost" type="button" ${backDisabled ? "disabled" : ""} id="savBackBtn">Retour</button>
+        <button class="btn primary" type="button" ${nextDisabled ? "disabled" : ""} id="savNextBtn">${nextLabel}</button>
+      </div>
+    `;
+  }
+
+  function savSetSide(){
+    document.getElementById("savSProb").textContent = sav.problems.length ? sav.problems.map(p => SAV_L.problems[p]).join(" • ") : "—";
+    document.getElementById("savSTime").textContent = sav.time ? SAV_L.time[sav.time] : "—";
+    document.getElementById("savSChange").textContent = sav.change ? SAV_L.change[sav.change] : "—";
+    document.getElementById("savSUse").textContent = sav.usage ? SAV_L.usage[sav.usage] : "—";
+  }
+
+  function savEngine(){
+    // The idea: prioritize the most common, simplest fix first.
+    const plan = [];
+    const avoid = [];
+    const badges = [];
+
+    const changedCoil = (sav.change === "coil");
+    const changedLiquid = (sav.change === "liquid");
+    const changedSettings = (sav.change === "settings");
+
+    const addPlan = (t) => plan.push(t);
+    const addAvoid = (t) => avoid.push(t);
+
+    // Global sanity checks
+    addPlan("Vérifier le niveau de liquide et l’état général (cartouche/réservoir propre, contacts secs).");
+    addPlan("Si le problème est apparu après un changement : revenir au dernier état stable (résistance/liquide/réglage).");
+
+    sav.problems.forEach(p => {
+      if(p === "leak"){
+        badges.push({t:"Fuite", c:"warn"});
+        addPlan("Fuite : vérifier fermeture, joints, et absence de condensation dans l’airflow.");
+        addPlan("Fuite : vérifier résistance/cartouche (usure, mauvaise insertion). Remplacer si doute.");
+        addPlan("Fuite : éviter remplissage excessif et laisser 5 minutes après remplissage.");
+        addAvoid("Airflow très ouvert avec liquide très fluide (risque de glouglou).");
+      }
+
+      if(p === "burnt"){
+        badges.push({t:"Brûlé", c:"bad"});
+        addPlan("Brûlé : résistance probablement en fin de vie ou mal amorcée → remplacer / réamorcer.");
+        addPlan("Brûlé : réduire la puissance et reprendre progressivement (confort).");
+        if(changedLiquid) addPlan("Brûlé après changement de liquide : vérifier compatibilité PG/VG avec le matériel.");
+        addAvoid("Enchaîner des bouffées longues avec puissance élevée sur résistance neuve (risque de brûler).");
+      }
+
+      if(p === "nogusto"){
+        badges.push({t:"Goût faible", c:"info"});
+        addPlan("Goût faible : vérifier puissance (trop basse ou trop haute) et stabiliser sur une plage modérée.");
+        addPlan("Goût faible : résistance encrassée → remplacer si usage régulier.");
+        addPlan("Goût faible : nettoyer drip-tip/contacts, vérifier airflow (trop ouvert peut diluer la sensation).");
+        addAvoid("Changer plusieurs paramètres en même temps (difficile d’identifier la cause).");
+      }
+
+      if(p === "cough"){
+        badges.push({t:"Irritation", c:"warn"});
+        addPlan("Irritation : vérifier nicotine (trop forte) OU puissance (trop élevée) → ajuster pour retrouver le confort.");
+        addPlan("Irritation : vérifier type d’inhalation (bouffées plus douces au début).");
+        addPlan("Irritation : vérifier hydratation et éviter enchaînement trop rapide.");
+        addAvoid("Tirage très aérien avec dosage élevé (souvent inconfortable).");
+      }
+
+      if(p === "nohit"){
+        badges.push({t:"Hit faible", c:"info"});
+        addPlan("Hit faible : vérifier dosage nicotine (souvent sous-dosage) et/ou resserrer le tirage.");
+        addPlan("Hit faible : vérifier résistance (trop basse en ohm / trop aérienne pour le profil) → orienter vers MTL si besoin.");
+        addAvoid("Compensation uniquement par puissance (risque d’inconfort sans satiété).");
+      }
+
+      if(p === "toohit"){
+        badges.push({t:"Hit fort", c:"warn"});
+        addPlan("Hit trop fort : baisser nicotine OU réduire puissance OU ouvrir légèrement le tirage (selon le cas).");
+        addPlan("Hit trop fort : vérifier que le matériel correspond au dosage (dosage haut → MTL modéré).");
+        addAvoid("Nicotine élevée + puissance élevée (inconfort fréquent).");
+      }
+
+      if(p === "nodraw"){
+        badges.push({t:"Ne déclenche pas", c:"bad"});
+        addPlan("Ne déclenche pas : vérifier charge batterie, contact 510 / contacts cartouche, et présence de liquide.");
+        addPlan("Ne déclenche pas : vérifier si résistance est bien reconnue (remettre / remplacer).");
+        addPlan("Ne déclenche pas : si dispositif auto-draw : vérifier condensation dans l’embout (nettoyer).");
+        addAvoid("Forcer si odeur de chaud ou message d’erreur répété (sécuriser).");
+      }
+
+      if(p === "battery"){
+        badges.push({t:"Autonomie", c:"info"});
+        addPlan("Autonomie : vérifier puissance (trop élevée) et optimiser l’usage (plage modérée).");
+        addPlan("Autonomie : proposer une batterie plus adaptée si usage intensif.");
+        addAvoid("Utiliser un câble/chargeur inadapté (risque de charge instable).");
+      }
+
+      if(p === "relapse"){
+        badges.push({t:"Risque reprise", c:"warn"});
+        addPlan("Reprise/envie : vérifier sous-dosage nicotine (souvent cause n°1) → ajuster temporairement si nécessaire.");
+        addPlan("Reprise/envie : identifier moments à risque (café, stress, après repas) et sécuriser ces moments.");
+        addPlan("Reprise/envie : conserver une solution simple/stable. Objectif : continuité.");
+        addAvoid("Baisser trop vite la nicotine ou changer trop de paramètres pendant une phase fragile.");
+      }
+    });
+
+    // Context tweaks
+    if(sav.usage === "intensive"){
+      addPlan("Usage intensif : remplacer la résistance plus régulièrement et sécuriser l’autonomie (matériel adapté).");
+      addAvoid("Résistance trop ancienne sur usage intensif (goût/fuite/brûlé).");
+    }
+    if(sav.time === "long"){
+      addPlan("Problème récurrent : revalider l’adéquation matériel ↔ dosage ↔ type de tirage (rééquilibrage).");
+    }
+
+    // Deduplicate
+    const uniq = (arr) => [...new Set(arr)];
+    return { badges: uniq(badges.map(b=>JSON.stringify(b))).map(s=>JSON.parse(s)), plan: uniq(plan), avoid: uniq(avoid) };
+  }
+
+  function savShowResult(){
+    const rec = savEngine();
+    document.getElementById("savResult").style.display = "block";
+
+    const b = rec.badges.slice(0,7).map(x => `<span class="b ${x.c}">${x.t}</span>`).join("");
+    document.getElementById("savBadges").innerHTML = b || `<span class="b info">SAV</span>`;
+
+    document.getElementById("savPlan").innerHTML = rec.plan.slice(0,10).map(t => `<li class="li"><div class="ic">✓</div><div class="tx">${t}</div></li>`).join("");
+    document.getElementById("savAvoid").innerHTML = rec.avoid.slice(0,8).map(t => `<li class="li"><div class="ic">!</div><div class="tx">${t}</div></li>`).join("");
+
+    document.getElementById("savCopyBtn").onclick = () => {
+      const txt =
+`STOOM — Plan SAV
+Problème(s) : ${sav.problems.map(p => SAV_L.problems[p]).join(", ")}
+Depuis quand : ${sav.time ? SAV_L.time[sav.time] : "—"}
+Changement récent : ${sav.change ? SAV_L.change[sav.change] : "—"}
+Type d’usage : ${sav.usage ? SAV_L.usage[sav.usage] : "—"}
+
+Plan d’action (priorité) :
+- ${rec.plan.slice(0,8).join("\n- ")}
+
+À vérifier / à éviter :
+- ${rec.avoid.slice(0,5).join("\n- ")}
+
+Conseil : si le confort n’est pas retrouvé rapidement, revenir en boutique pour ajustement (dosage/tirage/puissance).`;
+      copyToClipboard(txt, document.getElementById("savCopyBtn"));
+    };
+
+    document.getElementById("savNewBtn").onclick = savReset;
+  }
+
+  function savRender(){
+    savSetSide();
+
+    const header = (t, s) => `<div class="q">${t} <small>${s}</small></div>`;
+
+    if(sav.step === 1){
+      savMount(header("Étape 1 — Problème principal", "Choisir 1 à 3 (max) pour un diagnostic clair.") + `
+        <div class="options">
+          ${savOpt({key:"problems", value:"leak", icon:"💧", title:"Fuite / glouglou", desc:"Liquide dans l’airflow, projection, condensation."})}
+          ${savOpt({key:"problems", value:"burnt", icon:"🔥", title:"Goût de brûlé", desc:"Goût sec, désagréable, irritation."})}
+          ${savOpt({key:"problems", value:"nogusto", icon:"👃", title:"Pas assez de goût", desc:"Saveur faible ou instable."})}
+          ${savOpt({key:"problems", value:"cough", icon:"😷", title:"Toux / irritation", desc:"Inconfort gorge, toux, picotements."})}
+          ${savOpt({key:"problems", value:"nohit", icon:"➖", title:"Hit trop faible", desc:"Sensation trop légère, pas de “satiété”."})}
+          ${savOpt({key:"problems", value:"toohit", icon:"➕", title:"Hit trop fort", desc:"Sensation trop agressive."})}
+          ${savOpt({key:"problems", value:"nodraw", icon:"⛔", title:"Ne déclenche pas", desc:"Pas de vapeur, pas de tirage."})}
+          ${savOpt({key:"problems", value:"battery", icon:"🔋", title:"Batterie / autonomie", desc:"Se décharge trop vite, charge instable."})}
+          ${savOpt({key:"problems", value:"relapse", icon:"🚬", title:"Envie / reprise", desc:"Tentations, reprise de cigarettes."})}
+          <div style="opacity:.0;pointer-events:none"></div>
+        </div>
+        ${savNav()}
+      `);
+      document.getElementById("savResult").style.display = "none";
+    }
+
+    if(sav.step === 2){
+      savMount(header("Étape 2 — Contexte", "3 réponses rapides pour orienter la solution.") + `
+        <div class="q">Depuis quand ? <small>obligatoire</small></div>
+        <div class="options">
+          ${savOpt({key:"time", value:"now", icon:"⏱️", title:"Tout de suite", desc:"Depuis un changement / depuis le remplissage."})}
+          ${savOpt({key:"time", value:"today", icon:"📅", title:"Depuis aujourd’hui", desc:"Apparition récente."})}
+          ${savOpt({key:"time", value:"week", icon:"🗓️", title:"Depuis quelques jours", desc:"Progressif."})}
+          ${savOpt({key:"time", value:"long", icon:"∞", title:"Récurrent", desc:"Problème ancien ou répétitif."})}
+        </div>
+
+        <div style="height:14px"></div>
+
+        <div class="q">Qu’est-ce qui a changé ? <small>obligatoire</small></div>
+        <div class="options">
+          ${savOpt({key:"change", value:"coil", icon:"🧩", title:"Résistance / cartouche", desc:"Changement récent."})}
+          ${savOpt({key:"change", value:"liquid", icon:"🧪", title:"Liquide", desc:"Nouveau liquide, nouveau dosage, nouvelle base."})}
+          ${savOpt({key:"change", value:"settings", icon:"⚙️", title:"Réglages", desc:"Puissance, airflow, mode."})}
+          ${savOpt({key:"change", value:"none", icon:"—", title:"Rien", desc:"Aucun changement identifié."})}
+        </div>
+
+        <div style="height:14px"></div>
+
+        <div class="q">Type d’usage <small>obligatoire</small></div>
+        <div class="options">
+          ${savOpt({key:"usage", value:"normal", icon:"✓", title:"Normal", desc:"Usage standard."})}
+          ${savOpt({key:"usage", value:"intensive", icon:"⚡", title:"Intensif", desc:"Beaucoup de bouffées / journée chargée."})}
+          ${savOpt({key:"usage", value:"occasional", icon:"⏳", title:"Occasionnel", desc:"Quelques moments seulement."})}
+          <div style="opacity:.0;pointer-events:none"></div>
+        </div>
+
+        ${savNav()}
+      `);
+      document.getElementById("savResult").style.display = "none";
+    }
+
+    if(sav.step === 3){
+      savMount(header("Résultat — Plan SAV", "Solutions hiérarchisées + points de vigilance + copie en 1 clic.") + `
+        <div style="color:var(--muted);font-size:13px;line-height:1.45">
+          Le panneau de droite contient le plan SAV complet, prêt à copier pour le client.
+        </div>
+        ${savNav()}
+      `);
+      savShowResult();
+    }
+
+    // disabled look
+    savRoot.querySelectorAll("button[disabled]").forEach(b=>{ b.style.opacity=.55; b.style.cursor="not-allowed"; });
+  }
+
+  function savReset(){
+    sav.step = 1;
+    sav.problems = [];
+    sav.time = null;
+    sav.change = null;
+    sav.usage = null;
+    document.getElementById("savResult").style.display = "none";
+    savRender();
+  }
+
+  document.getElementById("resetSavBtn").onclick = savReset;
+
+  // =========================
+  // Boot
+  // =========================
   showPage("home");
 
-  // Ensure tool renders when entering material
+  // Render tools when entering
   const _showPage = showPage;
   showPage = function(name){
     _showPage(name);
     if(name === "material") renderTool();
+    if(name === "sav") savRender();
   };
 </script>
 </body>
