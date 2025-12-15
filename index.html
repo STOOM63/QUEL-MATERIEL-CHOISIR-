@@ -1744,7 +1744,7 @@ Conseil : si le confort n’est pas retrouvé rapidement, revenir en boutique po
     const header = (t, s) => `<div class="q">${t} <small>${s}</small></div>`;
 
     if(client.step === 1){
-      clientMount(header("Étape 1 — Combien de cigarettes par jour ?", "Choisir 1 option.") + `
+      clientMount(header("Étape 1 — Combien de cigarettes fumez vous par jour ?", "Choisir 1 option.") + `
         <div class="options">
           ${cOpt({key:"cigsPerDay", value:"low", icon:"①", title:"– 5 / jour", desc:"Profil très léger."})}
           ${cOpt({key:"cigsPerDay", value:"midlow", icon:"②", title:"5–10 / jour", desc:"Profil léger."})}
@@ -1758,11 +1758,11 @@ Conseil : si le confort n’est pas retrouvé rapidement, revenir en boutique po
     }
 
     if(client.step === 2){
-      clientMount(header("Étape 2 — Quel type de cigarettes ?", "Choisir 1 option.") + `
+      clientMount(header("Étape 2 — Quel type de cigarettes fumez vous ?", "Choisir 1 option.") + `
         <div class="options">
           ${cOpt({key:"cigType", value:"light", icon:"🌿", title:"Légères / blondes", desc:"Sensation plutôt douce."})}
           ${cOpt({key:"cigType", value:"regular", icon:"🚬", title:"Classiques", desc:"Sensation standard."})}
-          ${cOpt({key:"cigType", value:"strong", icon:"⚡", title:"Fortes", desc:"Hit marqué / satiété forte."})}
+          ${cOpt({key:"cigType", value:"strong", icon:"⚡", title:"Brunes", desc:"Hit marqué / satiété forte."})}
           ${cOpt({key:"cigType", value:"menthol", icon:"❄️", title:"Menthol", desc:"Fraîcheur / hit spécifique."})}
           ${cOpt({key:"cigType", value:"roll", icon:"🧻", title:"Roulées", desc:"Souvent plus “accrocheuses”."})}
           <div style="opacity:.0;pointer-events:none"></div>
@@ -1772,7 +1772,7 @@ Conseil : si le confort n’est pas retrouvé rapidement, revenir en boutique po
     }
 
     if(client.step === 3){
-      clientMount(header("Étape 3 — À quels moments la cigarette compte le plus ?", "Choisir 1 à 4.") + `
+      clientMount(header("Étape 3 — À quels moments de la journée la cigarette compte le plus pour vous ?", "Choisir 1 à 4.") + `
         <div class="options">
           ${cOpt({key:"moments", value:"coffee", icon:"☕", title:"Café", desc:"Moment typique."})}
           ${cOpt({key:"moments", value:"aftermeal", icon:"🍽️", title:"Après repas", desc:"Envie marquée."})}
@@ -1785,7 +1785,7 @@ Conseil : si le confort n’est pas retrouvé rapidement, revenir en boutique po
         </div>
 
         <div style="height:14px"></div>
-        <div class="q">Occasions particulières <small>0 à 3</small></div>
+        <div class="q">Fumez vous pour des occasions particulières <small>0 à 3</small></div>
         <div class="options">
           ${cOpt({key:"occasions", value:"alcool", icon:"🍻", title:"Alcool / soirée", desc:"Moments à risque."})}
           ${cOpt({key:"occasions", value:"social", icon:"👥", title:"Avec des gens", desc:"Cigarette sociale."})}
@@ -1802,7 +1802,7 @@ Conseil : si le confort n’est pas retrouvé rapidement, revenir en boutique po
     }
 
     if(client.step === 4){
-      clientMount(header("Étape 4 — Votre objectif", "Choisir 1 option.") + `
+      clientMount(header("Étape 4 — Aujourd'hui quel est votre objectif?", "Choisir 1 option.") + `
         <div class="options">
           ${cOpt({key:"goal", value:"stop_now", icon:"🚫", title:"Arrêter complètement", desc:"Objectif : continuité sans frustration."})}
           ${cOpt({key:"goal", value:"transition", icon:"🔄", title:"Transition progressive", desc:"On avance étape par étape."})}
@@ -1818,7 +1818,7 @@ Conseil : si le confort n’est pas retrouvé rapidement, revenir en boutique po
       const momentsTxt = client.moments.length ? client.moments.map(x=>L.habits[x]).join(" • ") : "—";
       const occTxt = client.occasions.length ? client.occasions.map(x=>CL.occasions[x]).join(" • ") : "—";
 
-      clientMount(header("Terminé ✅", "Remettez la tablette au vendeur.") + `
+      clientMount(header("Terminé ✅", "Vous pouvez remettre la tablette au vendeur qui va vous guider dans le choix du matériel idéal!.") + `
         <div class="result">
           <div class="badges">
             <span class="b info">${client.cigsPerDay ? CL.cigsPerDay[client.cigsPerDay] : "—"}</span>
