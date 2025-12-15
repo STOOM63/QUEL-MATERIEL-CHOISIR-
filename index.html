@@ -288,31 +288,6 @@
     .tools{ display:flex; gap:10px; margin-top:12px; }
     .tools .btn{ flex:1; }
 
-    /* Inputs */
-    .field{
-      display:grid;
-      gap:8px;
-      margin-top: 10px;
-    }
-    .input{
-      width:100%;
-      min-height: 48px;
-      padding: 12px 12px;
-      border-radius: 16px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      color: rgba(255,255,255,.92);
-      outline:none;
-      font-weight: 800;
-      letter-spacing: .2px;
-    }
-    .input::placeholder{ color: rgba(255,255,255,.40); font-weight:700; }
-    .help{
-      color: var(--muted);
-      font-size: 12.5px;
-      line-height: 1.35;
-    }
-
     /* Pages */
     .page{ display:none; }
     .page.on{ display:block; }
@@ -341,6 +316,7 @@
         <button class="btn ghost" id="homeBtn" type="button">Accueil</button>
         <button class="btn ghost" id="resetBtn" type="button" style="display:none;">Réinitialiser</button>
         <button class="btn ghost" id="resetSavBtn" type="button" style="display:none;">Réinit SAV</button>
+        <button class="btn ghost" id="resetClientBtn" type="button" style="display:none;">Réinit Client</button>
       </div>
     </div>
 
@@ -364,8 +340,8 @@
             <div class="tile" role="button" tabindex="0" data-go="client">
               <div class="ico">👤</div>
               <div>
-                <p class="t">Mode client (questionnaire)</p>
-                <p class="d">Le client répond, puis remet la tablette au vendeur → préconisation immédiate.</p>
+                <p class="t">Mode client (autonome)</p>
+                <p class="d">Le client répond → “Terminé ✅” → le vendeur récupère et voit la préconisation.</p>
               </div>
             </div>
 
@@ -417,11 +393,6 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- CLIENT -->
-        <div class="page" id="page-client">
-          <div class="content" id="clientRoot"></div>
         </div>
 
         <!-- DIY -->
@@ -571,6 +542,11 @@
           </div>
         </div>
 
+        <!-- CLIENT TOOL PAGE -->
+        <div class="page" id="page-client">
+          <div class="content" id="clientRoot"></div>
+        </div>
+
         <!-- MATERIAL TOOL PAGE -->
         <div class="page" id="page-material">
           <div class="content" id="materialRoot"></div>
@@ -621,11 +597,19 @@
                   <p class="v" id="rB">—</p>
                   <p class="s" id="rBNote"></p>
                 </div>
+
+                <div class="kpi" id="kpiC" style="display:none;">
+                  <p class="k">Option C — DL (plaisir)</p>
+                  <p class="v" id="rC">—</p>
+                  <p class="s" id="rCNote"></p>
+                </div>
+
                 <div class="kpi">
                   <p class="k">Nicotine (repère)</p>
                   <p class="v" id="rNico">—</p>
                   <p class="s" id="rNicoNote"></p>
                 </div>
+
                 <div class="kpi">
                   <p class="k">Budget tabac estimé</p>
                   <p class="v" id="rBudget">—</p>
@@ -674,8 +658,61 @@
             </div>
           </div>
 
+          <!-- CLIENT HINT (simple) -->
+          <div id="sideClient" style="display:none;color:var(--muted);font-size:13px;line-height:1.45">
+            Le client répond à quelques questions simples.<br><br>
+            À la fin, un message “Terminé ✅” s’affiche puis le vendeur voit la préconisation.
+          </div>
+
         </div>
       </aside>
+    </div>
+  </div>
+
+  <!-- POPUP FIN CLIENT -->
+  <div id="endPopup" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(7,10,18,.92);
+    z-index:9999;
+    align-items:center;
+    justify-content:center;
+  ">
+    <div style="
+      max-width:540px;
+      width:92%;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:26px;
+      padding:34px 26px;
+      text-align:center;
+      box-shadow:0 30px 80px rgba(0,0,0,.6);
+    ">
+      <div style="font-size:56px;margin-bottom:10px;">✅</div>
+
+      <h2 style="
+        margin:0 0 12px;
+        font-size:34px;
+        font-weight:1000;
+        letter-spacing:.4px;
+      ">
+        Terminé
+      </h2>
+
+      <p style="
+        font-size:18.5px;
+        line-height:1.45;
+        color:rgba(255,255,255,.92);
+        margin:0 0 26px;
+      ">
+        Vous pouvez remettre la tablette au vendeur<br>
+        qui va vous guider dans le choix du matériel idéal !
+      </p>
+
+      <button class="btn primary" id="closeEndPopup" style="min-width:240px;">
+        Voir la préconisation
+      </button>
     </div>
   </div>
 
@@ -690,18 +727,21 @@
 
     const isMaterial = (name === "material");
     const isSav = (name === "sav");
+    const isClient = (name === "client");
 
-    document.getElementById("modeTag").textContent = (isMaterial || isSav) ? "Outil" : "Hub";
+    document.getElementById("modeTag").textContent = (isMaterial || isSav || isClient) ? "Outil" : "Hub";
     document.getElementById("resetBtn").style.display = isMaterial ? "inline-block" : "none";
     document.getElementById("resetSavBtn").style.display = isSav ? "inline-block" : "none";
+    document.getElementById("resetClientBtn").style.display = isClient ? "inline-block" : "none";
 
-    document.getElementById("sideHubHint").style.display = (isMaterial || isSav) ? "none" : "block";
+    document.getElementById("sideHubHint").style.display = (isMaterial || isSav || isClient) ? "none" : "block";
     document.getElementById("sideMaterial").style.display = isMaterial ? "block" : "none";
     document.getElementById("sideSav").style.display = isSav ? "block" : "none";
+    document.getElementById("sideClient").style.display = isClient ? "block" : "none";
 
     const titles = {
       home: ["Accueil", "Choisissez un outil. Interface pensée pour un usage fluide en boutique."],
-      client: ["Mode client", "Répondez à quelques questions. Puis remettez la tablette au vendeur pour la préconisation."],
+      client: ["Mode client (autonome)", "Le client répond → terminé → le vendeur récupère la tablette."],
       material: ["Choisir le matériel", "Parcours vendeur : recommandations cohérentes + budget tabac + conseils."],
       sav: ["Mode SAV (diagnostic)", "Problèmes courants → causes probables → solutions hiérarchisées."],
       diy: ["Faire mon DIY", "Accès direct au calculateur DIY STOOM."],
@@ -958,6 +998,13 @@ Check-list : remplissage/recharge/changement résistance + plan d’ajustement +
     return [...new Set(tips)].slice(0,6);
   }
 
+  function powerAbove30(powerStr){
+    const match = powerStr && powerStr.match(/(\d+)\s*–\s*(\d+)W/);
+    if(!match) return false;
+    const maxW = parseInt(match[2], 10);
+    return maxW >= 30;
+  }
+
   function recommend(){
     let A = { draw:"MTL (tirage serré)", power:"8–18W • 0.8–1.4Ω", note:"Stabilité, simplicité, efficacité." };
     let B = { draw:"MTL confortable / RDL léger", power:"12–30W • 0.4–1.0Ω", note:"Polyvalent, évolutif, sans complexité inutile." };
@@ -995,16 +1042,79 @@ Check-list : remplissage/recharge/changement résistance + plan d’ajustement +
     if(state.priority === "vapeur"){ badges.push({t:"Vapeur", c:"info"}); avoid.push("Chercher la vapeur avant la stabilité."); }
     if(state.priority === "hit"){ badges.push({t:"Hit", c:"info"}); avoid.push("Compenser par la puissance au lieu d’ajuster le dosage."); }
 
+    // ---- Force une vraie différence A/B selon “vapeur” ----
+    const wantsVapeur = (state.feel === "vapeur" || state.priority === "vapeur");
+    const canRDL = (state.level !== "beginner") && (state.cigs !== "veryhigh");
+
+    if (wantsVapeur && canRDL) {
+      B.draw = "RDL (semi-aérien)";
+      B.power = "18–32W • 0.4–0.7Ω";
+      B.note = "Plus de densité et sensations, à condition d’adapter le dosage.";
+    }
+
+    if (state.feel === "cig") {
+      B.draw = "MTL confortable (un peu plus ouvert)";
+      B.power = "12–20W • 0.8–1.0Ω";
+      B.note = "Évolutif sans quitter la logique cigarette (confort + stabilité).";
+    }
+
+    // Ajuste nicotine si vrai RDL
+    if (B.draw.includes("RDL")) {
+      if (state.cigs === "low") nico = "3–6 mg/ml";
+      if (state.cigs === "mid") nico = "3–6 mg/ml (souvent 6)";
+      if (state.cigs === "high") nico = "6–10 mg/ml (selon confort)";
+      nicoNote = "En RDL, on baisse souvent la nicotine pour rester confortable (sinon hit/irritation).";
+    }
+
+    // ---- Option C — DL (PLAISIR) selon tes règles ----
+    let C = null;
+    const isPlaisir = (state.feel === "vapeur" || state.priority === "vapeur");
+    const notCigProfile = (state.feel !== "cig");
+    const notVeryHighCigs = (state.cigs !== "veryhigh");
+
+    if (isPlaisir && notCigProfile && notVeryHighCigs) {
+      if (state.level === "intermediate") {
+        C = {
+          draw: "DL (aérien modéré)",
+          power: "30–50W • 0.25–0.40Ω",
+          note: "DL plaisir maîtrisé. Vapeur dense sans excès, autonomie à anticiper."
+        };
+        nico = "3–6 mg/ml";
+        nicoNote = "En DL modéré, on baisse la nicotine pour rester confortable.";
+      }
+      if (state.level === "advanced") {
+        C = {
+          draw: "DL (aérien)",
+          power: "35–70W • 0.15–0.30Ω",
+          note: "DL plaisir assumé. Vapeur dense et sensations, réservé aux vapoteurs confirmés."
+        };
+        nico = "0–3 mg/ml";
+        nicoNote = "En DL à forte puissance, la nicotine doit rester basse pour éviter hit excessif et inconfort.";
+      }
+    }
+
     const uniqAvoid = [...new Set(avoid)];
     if(uniqAvoid.length === 0) uniqAvoid.push("Ajuster un paramètre à la fois : progression régulière.");
 
-    return {A,B,nico,nicoNote,badges,uniqAvoid};
+    return {A,B,C,nico,nicoNote,badges,uniqAvoid};
   }
 
   function showResult(){
     const rec = recommend();
     const tips = buildTips();
     const bud = calcBudget();
+
+    // ---- Message autonomie si >= 30W (RDL ou DL) ----
+    const highPower =
+      powerAbove30(rec.A.power) ||
+      powerAbove30(rec.B.power) ||
+      (rec.C && powerAbove30(rec.C.power));
+
+    if (highPower) {
+      tips.unshift(
+        "Les puissances supérieures à 30W consomment plus de batterie. Il sera donc conseillé de partir sur un pod autonome (~3000 mAh) ou sur une box avec accus supplémentaires (roulement charge / utilisation)."
+      );
+    }
 
     $("#resultBox").style.display = "block";
     $("#badges").innerHTML =
@@ -1013,6 +1123,16 @@ Check-list : remplissage/recharge/changement résistance + plan d’ajustement +
 
     $("#rA").textContent = `${rec.A.draw} • ${rec.A.power}`; $("#rANote").textContent = rec.A.note;
     $("#rB").textContent = `${rec.B.draw} • ${rec.B.power}`; $("#rBNote").textContent = rec.B.note;
+
+    // Option C (DL) visible seulement si rec.C existe
+    if (rec.C) {
+      document.getElementById("kpiC").style.display = "block";
+      document.getElementById("rC").textContent = `${rec.C.draw} • ${rec.C.power}`;
+      document.getElementById("rCNote").textContent = rec.C.note;
+    } else {
+      document.getElementById("kpiC").style.display = "none";
+    }
+
     $("#rNico").textContent = rec.nico; $("#rNicoNote").textContent = rec.nicoNote;
 
     if(bud){
@@ -1031,6 +1151,7 @@ Check-list : remplissage/recharge/changement résistance + plan d’ajustement +
 
     $("#copyBtn").onclick = async () => {
       const eqTxt = bud ? `Repère charges fixes : ${chargeEquivalence(bud.perYear)}` : `Repère charges fixes : —`;
+      const optC = rec.C ? `\nOption C (DL) : ${rec.C.draw} • ${rec.C.power} — ${rec.C.note}\n` : "";
       const txt =
 `STOOM — Résumé orientation matériel
 - Consommation : ${state.cigs ? L.cigs[state.cigs] : "—"}
@@ -1042,8 +1163,7 @@ Check-list : remplissage/recharge/changement résistance + plan d’ajustement +
 - Priorité : ${state.priority ? L.priority[state.priority] : "—"}
 
 Option A (Sécurité) : ${rec.A.draw} • ${rec.A.power} — ${rec.A.note}
-Option B (Évolutive) : ${rec.B.draw} • ${rec.B.power} — ${rec.B.note}
-
+Option B (Évolutive) : ${rec.B.draw} • ${rec.B.power} — ${rec.B.note}${optC}
 Nicotine (repère) : ${rec.nico}
 Note : ${rec.nicoNote}
 
@@ -1051,7 +1171,7 @@ Budget tabac estimé : ${bud ? `${fmt2(bud.perDay)} €/jour • ${fmt2(bud.perM
 ${eqTxt}
 
 Conseils :
-- ${buildTips().slice(0,5).join("\n- ")}
+- ${tipsArr.slice(0,5).join("\n- ")}
 
 Points de vigilance :
 - ${rec.uniqAvoid.slice(0,3).join("\n- ")}
@@ -1101,7 +1221,7 @@ Points de vigilance :
           ${opt({key:"habits", value:"car", icon:"🚗", title:"Voiture", desc:"Usage fréquent en voiture."})}
           ${opt({key:"habits", value:"breaks", icon:"⏱️", title:"Pauses courtes", desc:"Pauses de travail."})}
           ${opt({key:"habits", value:"morning", icon:"🌅", title:"Réveil", desc:"Première envie de la journée."})}
-          ${opt({key:"habits", value:"party", icon:"🍺", title:"Soirée", desc:"Contexte soirée."})}
+          ${opt({key:"habits", value:"party", icon:"🎉", title:"Soirée", desc:"Contexte soirée."})}
           ${opt({key:"habits", value:"tv", icon:"📺", title:"TV / gaming", desc:"Usage automatique."})}
         </div>
 
@@ -1188,14 +1308,304 @@ Points de vigilance :
   document.getElementById("resetBtn").onclick = resetAll;
 
   // =========================
-  // SAV TOOL
+  // MODE CLIENT (autonome)
+  // =========================
+  const client = {
+    step: 1,
+    cigs: null,
+    cigtype: null,
+    moments: [],
+    occasions: [],
+    objective: null,
+    experience: null
+  };
+
+  const clientRoot = document.getElementById("clientRoot");
+
+  const CL = {
+    cigs: { low:"– 10 / jour", mid:"10–15 / jour", high:"15–20 / jour", veryhigh:"20+ / jour" },
+    cigtype: { light:"Légère", strong:"Forte", menthol:"Menthol" },
+    moments: { morning:"Réveil", coffee:"Café", aftermeal:"Après repas", stress:"Stress", breaks:"Pauses courtes", car:"Voiture", evening:"Soir / détente" },
+    occasions: { party:"Soirée / alcool", social:"Entre amis", work:"Au travail", driving:"En voiture", habit:"Par habitude / automatisme" },
+    objective: { stop:"Arrêter", reduce:"Réduire", pleasure:"Plaisir / vapeur" },
+    experience: { beginner:"Débutant", intermediate:"Déjà vapoté", advanced:"Confirmé" }
+  };
+
+  function cIsOn(key, value){
+    if(Array.isArray(client[key])) return client[key].includes(value);
+    return client[key] === value;
+  }
+
+  function cOpt({key,value,icon,title,desc}){
+    const on = cIsOn(key,value) ? " on" : "";
+    return `
+      <div class="opt${on}" role="button" tabindex="0" data-ckey="${key}" data-cvalue="${value}">
+        <div class="icon">${icon}</div>
+        <div class="txt">
+          <p class="t">${title}</p>
+          <p class="d">${desc||""}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function cMount(html){
+    clientRoot.innerHTML = html;
+    clientRoot.querySelectorAll(".opt").forEach(el=>{
+      const handler = ()=>{
+        const key = el.dataset.ckey;
+        const val = el.dataset.cvalue;
+        if(key==="moments") return cToggle("moments", val, 4);
+        if(key==="occasions") return cToggle("occasions", val, 3);
+        client[key]=val;
+        clientRender();
+        clientAutoAdvance();
+      };
+      el.addEventListener("click", handler);
+      el.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); handler(); }});
+    });
+
+    const back = document.getElementById("cBackBtn");
+    const next = document.getElementById("cNextBtn");
+    if(back) back.onclick = ()=>{ client.step = Math.max(1, client.step-1); clientRender(); };
+    if(next) next.onclick = ()=>{
+      if(client.step < 4){ client.step += 1; clientRender(); }
+      else{ client.step = 1; clientRender(); }
+    };
+  }
+
+  function cToggle(key, val, max){
+    const i = client[key].indexOf(val);
+    if(i>=0) client[key].splice(i,1);
+    else client[key].push(val);
+    if(client[key].length > max) client[key].shift();
+
+    clientRender();
+    clientAutoAdvance();
+  }
+
+  function clientStepOk(n){
+    if(n===1) return !!(client.cigs && client.cigtype);
+    if(n===2) return !!(client.objective && client.experience);
+    if(n===3) return (client.moments.length>=1); // occasions optionnelles
+    if(n===4) return true;
+    return false;
+  }
+
+  function clientAutoAdvance(){
+    // Auto advance sur 1 et 2
+    if(client.step===1 && clientStepOk(1)){ client.step=2; clientRender(); return; }
+    if(client.step===2 && clientStepOk(2)){ client.step=3; clientRender(); return; }
+
+    // IMPORTANT : Étape 3 = moments + occasions
+    // -> PAS d'auto-advance ici (sinon bug : on saute avant de cocher occasions)
+  }
+
+  function cNav(){
+    const backDisabled = client.step===1;
+    const nextDisabled = (client.step===1 && !clientStepOk(1)) || (client.step===2 && !clientStepOk(2)) || (client.step===3 && !clientStepOk(3));
+    const nextLabel = client.step < 4 ? "Continuer" : "Revoir";
+    return `
+      <div class="navRow">
+        <button class="btn ghost" type="button" ${backDisabled ? "disabled" : ""} id="cBackBtn">Retour</button>
+        <button class="btn primary" type="button" ${nextDisabled ? "disabled" : ""} id="cNextBtn">${nextLabel}</button>
+      </div>
+    `;
+  }
+
+  function mapClientToMaterial(){
+    // Consommation -> direct
+    state.cigs = client.cigs;
+
+    // Objectif -> sensation / priorité
+    if(client.objective === "pleasure"){
+      state.feel = "vapeur";
+      state.priority = "vapeur";
+    }else if(client.objective === "stop"){
+      state.feel = "cig";
+      state.priority = "simple";
+    }else{
+      state.feel = "balanced";
+      state.priority = "confort";
+    }
+
+    // Moments -> habits (map simple)
+    const mapMoment = {
+      morning:"morning",
+      coffee:"coffee",
+      aftermeal:"aftermeal",
+      stress:"stress",
+      breaks:"breaks",
+      car:"car",
+      evening:"tv"
+    };
+    state.habits = client.moments.map(m=>mapMoment[m]).filter(Boolean).slice(0,4);
+
+    // Style : si occasions "habit" ou beaucoup moments -> frequent
+    state.style = (client.occasions.includes("habit") || client.moments.length>=2) ? "frequent" : "ritual";
+
+    // Niveau
+    state.level = client.experience;
+
+    // Contexte : si car ou work -> quick / car, sinon mixed
+    if(client.moments.includes("car") || client.occasions.includes("driving")) state.context = "car";
+    else if(client.occasions.includes("work") || client.moments.includes("breaks")) state.context = "quick";
+    else state.context = "mixed";
+
+    // Menthol : on ne force pas la reco, mais on peut marquer “gout”
+    if(client.cigtype === "menthol" && state.priority !== "vapeur") state.priority = "gout";
+  }
+
+  function openEndPopup(){
+    const p = document.getElementById("endPopup");
+    p.style.display = "flex";
+  }
+  function closeEndPopup(){
+    const p = document.getElementById("endPopup");
+    p.style.display = "none";
+  }
+
+  document.getElementById("closeEndPopup").onclick = ()=>{
+    closeEndPopup();
+    // vendeur voit la préconisation
+    showPage("material");
+    state.step = 5;
+    renderTool();
+    showResult();
+  };
+
+  function clientRender(){
+    const header = (t,s)=>`<div class="q">${t} <small>${s}</small></div>`;
+
+    if(client.step===1){
+      cMount(header("Étape 1 — Votre consommation", "2 réponses rapides") + `
+        <div class="q">Combien de cigarettes par jour ? <small>obligatoire</small></div>
+        <div class="options">
+          ${cOpt({key:"cigs", value:"low", icon:"①", title:"– 10 / jour"})}
+          ${cOpt({key:"cigs", value:"mid", icon:"②", title:"10–15 / jour"})}
+          ${cOpt({key:"cigs", value:"high", icon:"③", title:"15–20 / jour"})}
+          ${cOpt({key:"cigs", value:"veryhigh", icon:"④", title:"20+ / jour"})}
+        </div>
+
+        <div style="height:14px"></div>
+
+        <div class="q">Type de cigarettes ? <small>obligatoire</small></div>
+        <div class="options">
+          ${cOpt({key:"cigtype", value:"light", icon:"🟦", title:"Légère"})}
+          ${cOpt({key:"cigtype", value:"strong", icon:"🟥", title:"Forte"})}
+          ${cOpt({key:"cigtype", value:"menthol", icon:"🟩", title:"Menthol"})}
+          <div style="opacity:.0;pointer-events:none"></div>
+        </div>
+
+        ${cNav()}
+      `);
+    }
+
+    if(client.step===2){
+      cMount(header("Étape 2 — Votre objectif", "Et votre expérience") + `
+        <div class="q">Votre objectif principal <small>obligatoire</small></div>
+        <div class="options">
+          ${cOpt({key:"objective", value:"stop", icon:"✅", title:"Arrêter", desc:"Objectif : ne pas reprendre."})}
+          ${cOpt({key:"objective", value:"reduce", icon:"➖", title:"Réduire", desc:"Progressif et confortable."})}
+          ${cOpt({key:"objective", value:"pleasure", icon:"☁️", title:"Plaisir / vapeur", desc:"Plus de densité et sensations."})}
+          <div style="opacity:.0;pointer-events:none"></div>
+        </div>
+
+        <div style="height:14px"></div>
+
+        <div class="q">Avez-vous déjà vapoté ? <small>obligatoire</small></div>
+        <div class="options">
+          ${cOpt({key:"experience", value:"beginner", icon:"★", title:"Débutant"})}
+          ${cOpt({key:"experience", value:"intermediate", icon:"☆", title:"Déjà vapoté"})}
+          ${cOpt({key:"experience", value:"advanced", icon:"✦", title:"Confirmé"})}
+          <div style="opacity:.0;pointer-events:none"></div>
+        </div>
+
+        ${cNav()}
+      `);
+    }
+
+    if(client.step===3){
+      cMount(header("Étape 3 — Moments importants", "Choisissez 1 à 4 (occasions optionnelles)") + `
+        <div class="q">À quel moment la cigarette compte le plus ? <small>1 à 4</small></div>
+        <div class="options">
+          ${cOpt({key:"moments", value:"morning", icon:"🌅", title:"Réveil"})}
+          ${cOpt({key:"moments", value:"coffee", icon:"☕", title:"Café"})}
+          ${cOpt({key:"moments", value:"aftermeal", icon:"🍽️", title:"Après repas"})}
+          ${cOpt({key:"moments", value:"stress", icon:"😰", title:"Stress"})}
+          ${cOpt({key:"moments", value:"breaks", icon:"⏱️", title:"Pauses"})}
+          ${cOpt({key:"moments", value:"car", icon:"🚗", title:"Voiture"})}
+          ${cOpt({key:"moments", value:"evening", icon:"🌙", title:"Soir / détente"})}
+          <div style="opacity:.0;pointer-events:none"></div>
+        </div>
+
+        <div style="height:14px"></div>
+
+        <div class="q">Occasions particulières <small>optionnel (0 à 3)</small></div>
+        <div class="options">
+          ${cOpt({key:"occasions", value:"party", icon:"🎉", title:"Soirée / alcool"})}
+          ${cOpt({key:"occasions", value:"social", icon:"👥", title:"Entre amis"})}
+          ${cOpt({key:"occasions", value:"work", icon:"💼", title:"Au travail"})}
+          ${cOpt({key:"occasions", value:"driving", icon:"🚘", title:"En voiture"})}
+          ${cOpt({key:"occasions", value:"habit", icon:"🔁", title:"Automatisme"})}
+          <div style="opacity:.0;pointer-events:none"></div>
+        </div>
+
+        ${cNav()}
+      `);
+    }
+
+    if(client.step===4){
+      cMount(header("Fin du questionnaire", "Appuyez sur terminer") + `
+        <div style="color:var(--muted);font-size:13.5px;line-height:1.45">
+          Merci 🙌 Vos réponses sont enregistrées.
+          <div style="height:12px"></div>
+          <button class="btn primary" id="finishClientBtn" type="button" style="width:100%;min-height:58px;font-size:16px;">
+            Terminer ✅
+          </button>
+          <div style="height:10px"></div>
+          <div style="color:var(--muted2);font-size:12.5px;line-height:1.35">
+            Le vendeur vous guidera ensuite dans le choix du matériel et du taux de nicotine.
+          </div>
+        </div>
+        ${cNav()}
+      `);
+
+      const btn = document.getElementById("finishClientBtn");
+      if(btn){
+        btn.onclick = ()=>{
+          // On transforme les réponses client -> préconisation vendeur (material state)
+          mapClientToMaterial();
+          openEndPopup();
+        };
+      }
+    }
+
+    clientRoot.querySelectorAll("button[disabled]").forEach(b=>{ b.style.opacity=.55; b.style.cursor="not-allowed"; });
+  }
+
+  function resetClient(){
+    client.step = 1;
+    client.cigs = null;
+    client.cigtype = null;
+    client.moments = [];
+    client.occasions = [];
+    client.objective = null;
+    client.experience = null;
+    clientRender();
+  }
+
+  document.getElementById("resetClientBtn").onclick = resetClient;
+
+  // =========================
+  // SAV TOOL (inchangé)
   // =========================
   const sav = {
     step: 1,
-    problems: [], // multi
-    time: null,   // now, today, week, long
-    change: null, // coil, liquid, settings, none
-    usage: null,  // normal, intensive, occasional
+    problems: [],
+    time: null,
+    change: null,
+    usage: null,
   };
 
   const SAV_L = {
@@ -1210,23 +1620,9 @@ Points de vigilance :
       battery: "Batterie / autonomie",
       relapse: "Envie de cigarette / reprise"
     },
-    time: {
-      now: "Tout de suite / depuis le changement",
-      today: "Depuis aujourd’hui",
-      week: "Depuis quelques jours",
-      long: "Depuis longtemps / récurrent"
-    },
-    change: {
-      coil: "Résistance / cartouche",
-      liquid: "Liquide",
-      settings: "Réglages / airflow",
-      none: "Rien (à ma connaissance)"
-    },
-    usage: {
-      normal: "Usage normal",
-      intensive: "Usage intensif",
-      occasional: "Usage occasionnel"
-    }
+    time: { now: "Tout de suite / depuis le changement", today: "Depuis aujourd’hui", week: "Depuis quelques jours", long: "Depuis longtemps / récurrent" },
+    change: { coil: "Résistance / cartouche", liquid: "Liquide", settings: "Réglages / airflow", none: "Rien (à ma connaissance)" },
+    usage: { normal: "Usage normal", intensive: "Usage intensif", occasional: "Usage occasionnel" }
   };
 
   const savRoot = document.getElementById("savRoot");
@@ -1278,7 +1674,6 @@ Points de vigilance :
     if(sav.problems.length > 3) sav.problems.shift();
     savRender();
     savAutoAdvance();
-    return;
   }
 
   function savPick(key, val){
@@ -1319,7 +1714,6 @@ Points de vigilance :
   }
 
   function savEngine(){
-    // Prioriser les actions les plus simples / fréquentes en premier
     const plan = [];
     const avoid = [];
     const badges = [];
@@ -1329,7 +1723,6 @@ Points de vigilance :
     const addPlan = (t) => plan.push(t);
     const addAvoid = (t) => avoid.push(t);
 
-    // Global sanity checks
     addPlan("Vérifier le niveau de liquide et l’état général (cartouche/réservoir propre, contacts secs).");
     addPlan("Si le problème est apparu après un changement : revenir au dernier état stable (résistance/liquide/réglage).");
 
@@ -1341,7 +1734,7 @@ Points de vigilance :
         addPlan("Fuite : éviter le remplissage excessif et laisser 5 minutes après remplissage.");
         addPlan("Fuite : vérifier que la viscosité du liquide (PG/VG) corresponde bien au matériel.");
         addPlan("Fuite : même sans goût de brûlé, changer la résistance au plus tard toutes les 3–4 semaines (usage régulier).");
-        addAvoid("Lors des périodes de fortes chaleurs, le liquide devient plus fluide : une base plus épaisse (plus de VG) peut limiter les fuites.");
+        addAvoid("Lors des périodes de fortes chaleurs le liquide devient plus fluide, augmenter la viscosité des boosters pour limiter les fuites.");
       }
 
       if(p === "burnt"){
@@ -1387,7 +1780,6 @@ Points de vigilance :
         addPlan("Ne déclenche pas : vérifier charge batterie, contacts (cartouche/510), et présence de liquide.");
         addPlan("Ne déclenche pas : vérifier si la résistance est bien reconnue (remettre / remplacer).");
         addPlan("Ne déclenche pas : si dispositif auto-draw : vérifier condensation dans l’embout (nettoyer).");
-        addPlan("Si chauffe anormale / message d’erreur répété : arrêter l’usage et tester en boutique (sécurité).");
         addAvoid("Forcer si odeur de chaud ou message d’erreur répété (sécuriser).");
       }
 
@@ -1407,7 +1799,6 @@ Points de vigilance :
       }
     });
 
-    // Context tweaks
     if(sav.usage === "intensive"){
       addPlan("Usage intensif : remplacer la résistance plus régulièrement et sécuriser l’autonomie (matériel adapté).");
       addAvoid("Résistance trop ancienne sur usage intensif (goût/fuite/brûlé).");
@@ -1416,7 +1807,6 @@ Points de vigilance :
       addPlan("Problème récurrent : revalider l’adéquation matériel ↔ dosage ↔ type de tirage (rééquilibrage).");
     }
 
-    // Deduplicate
     const uniq = (arr) => [...new Set(arr)];
     const uniqBadges = uniq(badges.map(b=>JSON.stringify(b))).map(s=>JSON.parse(s));
     return { badges: uniqBadges, plan: uniq(plan), avoid: uniq(avoid) };
@@ -1522,7 +1912,6 @@ Conseil : si le confort n’est pas retrouvé rapidement, revenir en boutique po
       savShowResult();
     }
 
-    // disabled look
     savRoot.querySelectorAll("button[disabled]").forEach(b=>{ b.style.opacity=.55; b.style.cursor="not-allowed"; });
   }
 
@@ -1539,322 +1928,11 @@ Conseil : si le confort n’est pas retrouvé rapidement, revenir en boutique po
   document.getElementById("resetSavBtn").onclick = savReset;
 
   // =========================
-  // CLIENT MODE (questionnaire + bouton "Préconisation")
+  // Boot
   // =========================
-  const client = {
-    step: 1,
-    cigsPerDay: null, // low / midlow / mid / high / veryhigh
-    cigType: null,    // light / regular / strong / menthol / roll
-    moments: [],      // reuse keys: coffee/aftermeal/stress/car/breaks/morning/party/tv
-    occasions: [],    // alcool/social/work/anxiety/boredom/driving
-    goal: null        // stop_now / transition / reduce
-  };
+  showPage("home");
 
-  const clientRoot = document.getElementById("clientRoot");
-
-  const CL = {
-    cigsPerDay: {
-      low: "– 5 cig/j",
-      midlow: "5–10 cig/j",
-      mid: "10–15 cig/j",
-      high: "15–20 cig/j",
-      veryhigh: "20+ cig/j"
-    },
-    cigType: {
-      light: "Légères / blondes",
-      regular: "Classiques",
-      strong: "Fortes",
-      menthol: "Menthol",
-      roll: "Roulées"
-    },
-    occasions: {
-      alcool: "Alcool / soirée",
-      social: "Avec des gens (social)",
-      work: "Au travail / pauses",
-      anxiety: "Anxiété / tension",
-      boredom: "Automatisme / ennui",
-      driving: "Conduite"
-    },
-    goal: {
-      stop_now: "Arrêt complet",
-      transition: "Transition progressive",
-      reduce: "Réduire d’abord"
-    }
-  };
-
-  function cIsOn(key, value){
-    if(Array.isArray(client[key])) return client[key].includes(value);
-    return client[key] === value;
-  }
-
-  function cOpt({key, value, icon, title, desc}){
-    const on = cIsOn(key, value) ? " on" : "";
-    return `
-      <div class="opt${on}" role="button" tabindex="0" data-ckey="${key}" data-cvalue="${value}">
-        <div class="icon">${icon}</div>
-        <div class="txt">
-          <p class="t">${title}</p>
-          <p class="d">${desc || ""}</p>
-        </div>
-      </div>
-    `;
-  }
-
-  function clientStepOk(n){
-    if(n === 1) return !!client.cigsPerDay;
-    if(n === 2) return !!client.cigType;
-    if(n === 3) return client.moments.length >= 1;
-    if(n === 4) return !!client.goal;
-    return false;
-  }
-
-  function clientNav(){
-    const backDisabled = client.step === 1;
-    const nextDisabled =
-      (client.step === 1 && !clientStepOk(1)) ||
-      (client.step === 2 && !clientStepOk(2)) ||
-      (client.step === 3 && !clientStepOk(3)) ||
-      (client.step === 4 && !clientStepOk(4));
-
-    const nextLabel = client.step < 5 ? "Continuer" : "Revoir";
-    return `
-      <div class="navRow">
-        <button class="btn ghost" type="button" ${backDisabled ? "disabled" : ""} id="clientBackBtn">Retour</button>
-        <button class="btn primary" type="button" ${nextDisabled ? "disabled" : ""} id="clientNextBtn">${nextLabel}</button>
-      </div>
-    `;
-  }
-
-  function clientMount(html){
-    clientRoot.innerHTML = html;
-
-    clientRoot.querySelectorAll(".opt").forEach(el => {
-      const handler = () => {
-        const key = el.dataset.ckey;
-        const val = el.dataset.cvalue;
-
-        if(key === "moments" || key === "occasions"){
-          const arr = client[key];
-          const i = arr.indexOf(val);
-          if(i >= 0) arr.splice(i,1);
-          else arr.push(val);
-          if(arr.length > (key === "moments" ? 4 : 3)) arr.shift();
-          clientRender();
-          clientAutoAdvance();
-          return;
-        }
-
-        client[key] = val;
-        clientRender();
-        clientAutoAdvance();
-      };
-
-      el.addEventListener("click", handler);
-      el.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); handler(); }});
-    });
-
-    const back = document.getElementById("clientBackBtn");
-    const next = document.getElementById("clientNextBtn");
-    if(back) back.onclick = () => { client.step = Math.max(1, client.step-1); clientRender(); };
-    if(next) next.onclick = () => {
-      if(client.step < 5){ client.step += 1; clientRender(); }
-      else{ client.step = 1; clientRender(); }
-    };
-
-    const vbtn = document.getElementById("vendorRecoBtn");
-    if(vbtn){
-      vbtn.onclick = () => vendorPreconisationFromClient();
-    }
-    const rst = document.getElementById("clientRestartBtn");
-    if(rst){
-      rst.onclick = () => clientReset();
-    }
-  }
-
-  function clientAutoAdvance(){
-  // Auto-advance OK pour les étapes simples (1 et 2)
-  if(client.step === 1 && clientStepOk(1)){ client.step = 2; clientRender(); return; }
-  if(client.step === 2 && clientStepOk(2)){ client.step = 3; clientRender(); return; }
-
-  // IMPORTANT :
-  // Étape 3 = moments + occasions -> on NE passe PAS automatiquement à l’étape 4
-  // Le client doit cliquer sur "Continuer" quand il a fini.
-
-  // Auto-advance OK après l’étape 4
-  if(client.step === 4 && clientStepOk(4)){ client.step = 5; clientRender(); return; }
-}
-
-
-  function clientReset(){
-    client.step = 1;
-    client.cigsPerDay = null;
-    client.cigType = null;
-    client.moments = [];
-    client.occasions = [];
-    client.goal = null;
-    clientRender();
-  }
-
-  // Mapping Client -> Material state (en gardant TA logique de préco)
-  function mapClientToMaterial(){
-    // cigs
-    if(client.cigsPerDay === "low") state.cigs = "low";
-    if(client.cigsPerDay === "midlow") state.cigs = "low";
-    if(client.cigsPerDay === "mid") state.cigs = "mid";
-    if(client.cigsPerDay === "high") state.cigs = "high";
-    if(client.cigsPerDay === "veryhigh") state.cigs = "veryhigh";
-
-    // feel (type de cigarette -> sensation)
-    if(client.cigType === "menthol") state.feel = "cig";
-    else if(client.cigType === "roll" || client.cigType === "strong") state.feel = "cig";
-    else state.feel = "balanced";
-
-    // habits
-    state.habits = (client.moments || []).slice(0,4);
-
-    // style (déduction simple)
-    // si pauses travail/voiture -> frequent, si soirée/alcool -> variable, sinon ritual par défaut
-    const m = new Set(client.moments || []);
-    if(m.has("breaks") || m.has("car")) state.style = "frequent";
-    else if(m.has("party") || (client.occasions || []).includes("alcool")) state.style = "variable";
-    else state.style = "ritual";
-
-    // level (client)
-    state.level = "beginner";
-
-    // context (si voiture)
-    if(m.has("car")) state.context = "car";
-    else if(m.has("breaks")) state.context = "quick";
-    else state.context = "mixed";
-
-    // priority (objectif + contexte)
-    if(client.goal === "stop_now") state.priority = "confort";
-    else if(client.goal === "transition") state.priority = "simple";
-    else state.priority = "simple";
-  }
-
-  function vendorPreconisationFromClient(){
-    mapClientToMaterial();
-    state.step = 5; // résultat direct
-    showPage("material");
-    renderTool();
-  }
-
-  function clientRender(){
-    const header = (t, s) => `<div class="q">${t} <small>${s}</small></div>`;
-
-    if(client.step === 1){
-      clientMount(header("Étape 1 — Combien de cigarettes fumez vous par jour ?", "Choisir 1 option.") + `
-        <div class="options">
-          ${cOpt({key:"cigsPerDay", value:"low", icon:"①", title:"– 5 / jour", desc:"Profil très léger."})}
-          ${cOpt({key:"cigsPerDay", value:"midlow", icon:"②", title:"5–10 / jour", desc:"Profil léger."})}
-          ${cOpt({key:"cigsPerDay", value:"mid", icon:"③", title:"10–15 / jour", desc:"Profil modéré."})}
-          ${cOpt({key:"cigsPerDay", value:"high", icon:"④", title:"15–20 / jour", desc:"Profil soutenu."})}
-          ${cOpt({key:"cigsPerDay", value:"veryhigh", icon:"⑤", title:"20+ / jour", desc:"Profil intense."})}
-          <div style="opacity:.0;pointer-events:none"></div>
-        </div>
-        ${clientNav()}
-      `);
-    }
-
-    if(client.step === 2){
-      clientMount(header("Étape 2 — Quel type de cigarettes fumez vous ?", "Choisir 1 option.") + `
-        <div class="options">
-          ${cOpt({key:"cigType", value:"light", icon:"🌿", title:"Légères / blondes", desc:"Sensation plutôt douce."})}
-          ${cOpt({key:"cigType", value:"regular", icon:"🚬", title:"Classiques", desc:"Sensation standard."})}
-          ${cOpt({key:"cigType", value:"strong", icon:"⚡", title:"Brunes", desc:"Hit marqué / satiété forte."})}
-          ${cOpt({key:"cigType", value:"menthol", icon:"❄️", title:"Menthol", desc:"Fraîcheur / hit spécifique."})}
-          ${cOpt({key:"cigType", value:"roll", icon:"🧻", title:"Roulées", desc:"Souvent plus “accrocheuses”."})}
-          <div style="opacity:.0;pointer-events:none"></div>
-        </div>
-        ${clientNav()}
-      `);
-    }
-
-    if(client.step === 3){
-      clientMount(header("Étape 3 — À quels moments de la journée la cigarette compte le plus pour vous ?", "Choisir 1 à 4.") + `
-        <div class="options">
-          ${cOpt({key:"moments", value:"coffee", icon:"☕", title:"Café", desc:"Moment typique."})}
-          ${cOpt({key:"moments", value:"aftermeal", icon:"🍽️", title:"Après repas", desc:"Envie marquée."})}
-          ${cOpt({key:"moments", value:"stress", icon:"😰", title:"Stress", desc:"Envies liées au stress."})}
-          ${cOpt({key:"moments", value:"car", icon:"🚗", title:"Voiture", desc:"Usage fréquent en voiture."})}
-          ${cOpt({key:"moments", value:"breaks", icon:"⏱️", title:"Pauses rapides", desc:"Au travail."})}
-          ${cOpt({key:"moments", value:"morning", icon:"🌅", title:"Réveil", desc:"Première envie."})}
-          ${cOpt({key:"moments", value:"party", icon:"🍺", title:"Soirée", desc:"Contexte social."})}
-          ${cOpt({key:"moments", value:"tv", icon:"📺", title:"Télé / détente", desc:"Automatisme."})}
-        </div>
-
-        <div style="height:14px"></div>
-        <div class="q">Fumez vous pour des occasions particulières <small>0 à 3</small></div>
-        <div class="options">
-          ${cOpt({key:"occasions", value:"alcool", icon:"🍻", title:"Alcool / soirée", desc:"Moments à risque."})}
-          ${cOpt({key:"occasions", value:"social", icon:"👥", title:"Avec des gens", desc:"Cigarette sociale."})}
-          ${cOpt({key:"occasions", value:"work", icon:"💼", title:"Au travail", desc:"Rythme des pauses."})}
-          ${cOpt({key:"occasions", value:"anxiety", icon:"😟", title:"Anxiété / tension", desc:"Gestion émotionnelle."})}
-          ${cOpt({key:"occasions", value:"boredom", icon:"😐", title:"Ennui / automatisme", desc:"Gestuelle."})}
-          ${cOpt({key:"occasions", value:"driving", icon:"🛣️", title:"Conduite", desc:"Routines voiture."})}
-          <div style="opacity:.0;pointer-events:none"></div>
-          <div style="opacity:.0;pointer-events:none"></div>
-        </div>
-
-        ${clientNav()}
-      `);
-    }
-
-    if(client.step === 4){
-      clientMount(header("Étape 4 — Aujourd'hui quel est votre objectif?", "Choisir 1 option.") + `
-        <div class="options">
-          ${cOpt({key:"goal", value:"stop_now", icon:"🚫", title:"Arrêter complètement", desc:"Objectif : continuité sans frustration."})}
-          ${cOpt({key:"goal", value:"transition", icon:"🔄", title:"Transition progressive", desc:"On avance étape par étape."})}
-          ${cOpt({key:"goal", value:"reduce", icon:"➖", title:"Réduire d’abord", desc:"On sécurise puis on descend."})}
-          <div style="opacity:.0;pointer-events:none"></div>
-        </div>
-
-        ${clientNav()}
-      `);
-    }
-
-    if(client.step === 5){
-      const momentsTxt = client.moments.length ? client.moments.map(x=>L.habits[x]).join(" • ") : "—";
-      const occTxt = client.occasions.length ? client.occasions.map(x=>CL.occasions[x]).join(" • ") : "—";
-
-      clientMount(header("Terminé ✅", "Vous pouvez remettre la tablette au vendeur qui va vous guider dans le choix du matériel idéal!.") + `
-        <div class="result">
-          <div class="badges">
-            <span class="b info">${client.cigsPerDay ? CL.cigsPerDay[client.cigsPerDay] : "—"}</span>
-            <span class="b info">${client.cigType ? CL.cigType[client.cigType] : "—"}</span>
-            <span class="b info">${client.goal ? CL.goal[client.goal] : "—"}</span>
-          </div>
-
-          <div class="sectionTitle">Résumé client</div>
-          <ul class="list">
-            <li class="li"><div class="ic">🕒</div><div class="tx"><strong>Moments clés :</strong> ${momentsTxt}</div></li>
-            <li class="li"><div class="ic">⭐</div><div class="tx"><strong>Occasions :</strong> ${occTxt}</div></li>
-          </ul>
-
-          <div class="sectionTitle">Vendeur</div>
-          <div style="color:var(--muted);font-size:13px;line-height:1.45">
-            Cliquez sur <strong>Préconisation</strong> pour afficher directement ce que vous devez proposer
-            (matériel + taux de nicotine) en utilisant la logique STOOM déjà intégrée.
-          </div>
-
-          <div class="tools">
-            <button class="btn primary" id="vendorRecoBtn" type="button">Préconisation (vendeur)</button>
-            <button class="btn ghost" id="clientRestartBtn" type="button">Recommencer</button>
-          </div>
-        </div>
-
-        ${clientNav()}
-      `);
-    }
-
-    clientRoot.querySelectorAll("button[disabled]").forEach(b=>{ b.style.opacity=.55; b.style.cursor="not-allowed"; });
-  }
-
-  // =========================
-  // Boot + wrapper showPage
-  // =========================
-  // Render tools when entering pages
+  // Render tools when entering
   const _showPage = showPage;
   showPage = function(name){
     _showPage(name);
@@ -1862,8 +1940,6 @@ Conseil : si le confort n’est pas retrouvé rapidement, revenir en boutique po
     if(name === "sav") savRender();
     if(name === "client") clientRender();
   };
-
-  showPage("home");
 </script>
 </body>
 </html>
