@@ -361,6 +361,14 @@
         <!-- HOME -->
         <div class="page on" id="page-home">
           <div class="homeGrid">
+            <div class="tile" role="button" tabindex="0" data-go="client">
+              <div class="ico">👤</div>
+              <div>
+                <p class="t">Mode client (questionnaire)</p>
+                <p class="d">Le client répond, puis remet la tablette au vendeur → préconisation immédiate.</p>
+              </div>
+            </div>
+
             <div class="tile" role="button" tabindex="0" data-go="material">
               <div class="ico">⚡</div>
               <div>
@@ -409,6 +417,11 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- CLIENT -->
+        <div class="page" id="page-client">
+          <div class="content" id="clientRoot"></div>
         </div>
 
         <!-- DIY -->
@@ -670,7 +683,7 @@
   // =========================
   // Router
   // =========================
-  const pages = ["home","material","sav","diy","quicktips","seller","about"];
+  const pages = ["home","client","material","sav","diy","quicktips","seller","about"];
 
   function showPage(name){
     pages.forEach(p => document.getElementById("page-"+p).classList.toggle("on", p===name));
@@ -688,6 +701,7 @@
 
     const titles = {
       home: ["Accueil", "Choisissez un outil. Interface pensée pour un usage fluide en boutique."],
+      client: ["Mode client", "Répondez à quelques questions. Puis remettez la tablette au vendeur pour la préconisation."],
       material: ["Choisir le matériel", "Parcours vendeur : recommandations cohérentes + budget tabac + conseils."],
       sav: ["Mode SAV (diagnostic)", "Problèmes courants → causes probables → solutions hiérarchisées."],
       diy: ["Faire mon DIY", "Accès direct au calculateur DIY STOOM."],
@@ -1264,6 +1278,7 @@ Points de vigilance :
     if(sav.problems.length > 3) sav.problems.shift();
     savRender();
     savAutoAdvance();
+    return;
   }
 
   function savPick(key, val){
@@ -1326,7 +1341,7 @@ Points de vigilance :
         addPlan("Fuite : éviter le remplissage excessif et laisser 5 minutes après remplissage.");
         addPlan("Fuite : vérifier que la viscosité du liquide (PG/VG) corresponde bien au matériel.");
         addPlan("Fuite : même sans goût de brûlé, changer la résistance au plus tard toutes les 3–4 semaines (usage régulier).");
-        addAvoid("Lors des periodes de fortes chaleurs le liquide devient plus fluide, augmenter la viscosité des boosters pour limiter les fuites.");
+        addAvoid("Lors des périodes de fortes chaleurs, le liquide devient plus fluide : une base plus épaisse (plus de VG) peut limiter les fuites.");
       }
 
       if(p === "burnt"){
@@ -1372,6 +1387,7 @@ Points de vigilance :
         addPlan("Ne déclenche pas : vérifier charge batterie, contacts (cartouche/510), et présence de liquide.");
         addPlan("Ne déclenche pas : vérifier si la résistance est bien reconnue (remettre / remplacer).");
         addPlan("Ne déclenche pas : si dispositif auto-draw : vérifier condensation dans l’embout (nettoyer).");
+        addPlan("Si chauffe anormale / message d’erreur répété : arrêter l’usage et tester en boutique (sécurité).");
         addAvoid("Forcer si odeur de chaud ou message d’erreur répété (sécuriser).");
       }
 
@@ -1523,17 +1539,324 @@ Conseil : si le confort n’est pas retrouvé rapidement, revenir en boutique po
   document.getElementById("resetSavBtn").onclick = savReset;
 
   // =========================
-  // Boot
+  // CLIENT MODE (questionnaire + bouton "Préconisation")
   // =========================
-  showPage("home");
+  const client = {
+    step: 1,
+    cigsPerDay: null, // low / midlow / mid / high / veryhigh
+    cigType: null,    // light / regular / strong / menthol / roll
+    moments: [],      // reuse keys: coffee/aftermeal/stress/car/breaks/morning/party/tv
+    occasions: [],    // alcool/social/work/anxiety/boredom/driving
+    goal: null        // stop_now / transition / reduce
+  };
 
-  // Render tools when entering
+  const clientRoot = document.getElementById("clientRoot");
+
+  const CL = {
+    cigsPerDay: {
+      low: "– 5 cig/j",
+      midlow: "5–10 cig/j",
+      mid: "10–15 cig/j",
+      high: "15–20 cig/j",
+      veryhigh: "20+ cig/j"
+    },
+    cigType: {
+      light: "Légères / blondes",
+      regular: "Classiques",
+      strong: "Fortes",
+      menthol: "Menthol",
+      roll: "Roulées"
+    },
+    occasions: {
+      alcool: "Alcool / soirée",
+      social: "Avec des gens (social)",
+      work: "Au travail / pauses",
+      anxiety: "Anxiété / tension",
+      boredom: "Automatisme / ennui",
+      driving: "Conduite"
+    },
+    goal: {
+      stop_now: "Arrêt complet",
+      transition: "Transition progressive",
+      reduce: "Réduire d’abord"
+    }
+  };
+
+  function cIsOn(key, value){
+    if(Array.isArray(client[key])) return client[key].includes(value);
+    return client[key] === value;
+  }
+
+  function cOpt({key, value, icon, title, desc}){
+    const on = cIsOn(key, value) ? " on" : "";
+    return `
+      <div class="opt${on}" role="button" tabindex="0" data-ckey="${key}" data-cvalue="${value}">
+        <div class="icon">${icon}</div>
+        <div class="txt">
+          <p class="t">${title}</p>
+          <p class="d">${desc || ""}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function clientStepOk(n){
+    if(n === 1) return !!client.cigsPerDay;
+    if(n === 2) return !!client.cigType;
+    if(n === 3) return client.moments.length >= 1;
+    if(n === 4) return !!client.goal;
+    return false;
+  }
+
+  function clientNav(){
+    const backDisabled = client.step === 1;
+    const nextDisabled =
+      (client.step === 1 && !clientStepOk(1)) ||
+      (client.step === 2 && !clientStepOk(2)) ||
+      (client.step === 3 && !clientStepOk(3)) ||
+      (client.step === 4 && !clientStepOk(4));
+
+    const nextLabel = client.step < 5 ? "Continuer" : "Revoir";
+    return `
+      <div class="navRow">
+        <button class="btn ghost" type="button" ${backDisabled ? "disabled" : ""} id="clientBackBtn">Retour</button>
+        <button class="btn primary" type="button" ${nextDisabled ? "disabled" : ""} id="clientNextBtn">${nextLabel}</button>
+      </div>
+    `;
+  }
+
+  function clientMount(html){
+    clientRoot.innerHTML = html;
+
+    clientRoot.querySelectorAll(".opt").forEach(el => {
+      const handler = () => {
+        const key = el.dataset.ckey;
+        const val = el.dataset.cvalue;
+
+        if(key === "moments" || key === "occasions"){
+          const arr = client[key];
+          const i = arr.indexOf(val);
+          if(i >= 0) arr.splice(i,1);
+          else arr.push(val);
+          if(arr.length > (key === "moments" ? 4 : 3)) arr.shift();
+          clientRender();
+          clientAutoAdvance();
+          return;
+        }
+
+        client[key] = val;
+        clientRender();
+        clientAutoAdvance();
+      };
+
+      el.addEventListener("click", handler);
+      el.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); handler(); }});
+    });
+
+    const back = document.getElementById("clientBackBtn");
+    const next = document.getElementById("clientNextBtn");
+    if(back) back.onclick = () => { client.step = Math.max(1, client.step-1); clientRender(); };
+    if(next) next.onclick = () => {
+      if(client.step < 5){ client.step += 1; clientRender(); }
+      else{ client.step = 1; clientRender(); }
+    };
+
+    const vbtn = document.getElementById("vendorRecoBtn");
+    if(vbtn){
+      vbtn.onclick = () => vendorPreconisationFromClient();
+    }
+    const rst = document.getElementById("clientRestartBtn");
+    if(rst){
+      rst.onclick = () => clientReset();
+    }
+  }
+
+  function clientAutoAdvance(){
+    if(client.step === 1 && clientStepOk(1)){ client.step = 2; clientRender(); return; }
+    if(client.step === 2 && clientStepOk(2)){ client.step = 3; clientRender(); return; }
+    if(client.step === 3 && clientStepOk(3)){ client.step = 4; clientRender(); return; }
+    if(client.step === 4 && clientStepOk(4)){ client.step = 5; clientRender(); return; }
+  }
+
+  function clientReset(){
+    client.step = 1;
+    client.cigsPerDay = null;
+    client.cigType = null;
+    client.moments = [];
+    client.occasions = [];
+    client.goal = null;
+    clientRender();
+  }
+
+  // Mapping Client -> Material state (en gardant TA logique de préco)
+  function mapClientToMaterial(){
+    // cigs
+    if(client.cigsPerDay === "low") state.cigs = "low";
+    if(client.cigsPerDay === "midlow") state.cigs = "low";
+    if(client.cigsPerDay === "mid") state.cigs = "mid";
+    if(client.cigsPerDay === "high") state.cigs = "high";
+    if(client.cigsPerDay === "veryhigh") state.cigs = "veryhigh";
+
+    // feel (type de cigarette -> sensation)
+    if(client.cigType === "menthol") state.feel = "cig";
+    else if(client.cigType === "roll" || client.cigType === "strong") state.feel = "cig";
+    else state.feel = "balanced";
+
+    // habits
+    state.habits = (client.moments || []).slice(0,4);
+
+    // style (déduction simple)
+    // si pauses travail/voiture -> frequent, si soirée/alcool -> variable, sinon ritual par défaut
+    const m = new Set(client.moments || []);
+    if(m.has("breaks") || m.has("car")) state.style = "frequent";
+    else if(m.has("party") || (client.occasions || []).includes("alcool")) state.style = "variable";
+    else state.style = "ritual";
+
+    // level (client)
+    state.level = "beginner";
+
+    // context (si voiture)
+    if(m.has("car")) state.context = "car";
+    else if(m.has("breaks")) state.context = "quick";
+    else state.context = "mixed";
+
+    // priority (objectif + contexte)
+    if(client.goal === "stop_now") state.priority = "confort";
+    else if(client.goal === "transition") state.priority = "simple";
+    else state.priority = "simple";
+  }
+
+  function vendorPreconisationFromClient(){
+    mapClientToMaterial();
+    state.step = 5; // résultat direct
+    showPage("material");
+    renderTool();
+  }
+
+  function clientRender(){
+    const header = (t, s) => `<div class="q">${t} <small>${s}</small></div>`;
+
+    if(client.step === 1){
+      clientMount(header("Étape 1 — Combien de cigarettes par jour ?", "Choisir 1 option.") + `
+        <div class="options">
+          ${cOpt({key:"cigsPerDay", value:"low", icon:"①", title:"– 5 / jour", desc:"Profil très léger."})}
+          ${cOpt({key:"cigsPerDay", value:"midlow", icon:"②", title:"5–10 / jour", desc:"Profil léger."})}
+          ${cOpt({key:"cigsPerDay", value:"mid", icon:"③", title:"10–15 / jour", desc:"Profil modéré."})}
+          ${cOpt({key:"cigsPerDay", value:"high", icon:"④", title:"15–20 / jour", desc:"Profil soutenu."})}
+          ${cOpt({key:"cigsPerDay", value:"veryhigh", icon:"⑤", title:"20+ / jour", desc:"Profil intense."})}
+          <div style="opacity:.0;pointer-events:none"></div>
+        </div>
+        ${clientNav()}
+      `);
+    }
+
+    if(client.step === 2){
+      clientMount(header("Étape 2 — Quel type de cigarettes ?", "Choisir 1 option.") + `
+        <div class="options">
+          ${cOpt({key:"cigType", value:"light", icon:"🌿", title:"Légères / blondes", desc:"Sensation plutôt douce."})}
+          ${cOpt({key:"cigType", value:"regular", icon:"🚬", title:"Classiques", desc:"Sensation standard."})}
+          ${cOpt({key:"cigType", value:"strong", icon:"⚡", title:"Fortes", desc:"Hit marqué / satiété forte."})}
+          ${cOpt({key:"cigType", value:"menthol", icon:"❄️", title:"Menthol", desc:"Fraîcheur / hit spécifique."})}
+          ${cOpt({key:"cigType", value:"roll", icon:"🧻", title:"Roulées", desc:"Souvent plus “accrocheuses”."})}
+          <div style="opacity:.0;pointer-events:none"></div>
+        </div>
+        ${clientNav()}
+      `);
+    }
+
+    if(client.step === 3){
+      clientMount(header("Étape 3 — À quels moments la cigarette compte le plus ?", "Choisir 1 à 4.") + `
+        <div class="options">
+          ${cOpt({key:"moments", value:"coffee", icon:"☕", title:"Café", desc:"Moment typique."})}
+          ${cOpt({key:"moments", value:"aftermeal", icon:"🍽️", title:"Après repas", desc:"Envie marquée."})}
+          ${cOpt({key:"moments", value:"stress", icon:"😰", title:"Stress", desc:"Envies liées au stress."})}
+          ${cOpt({key:"moments", value:"car", icon:"🚗", title:"Voiture", desc:"Usage fréquent en voiture."})}
+          ${cOpt({key:"moments", value:"breaks", icon:"⏱️", title:"Pauses rapides", desc:"Au travail."})}
+          ${cOpt({key:"moments", value:"morning", icon:"🌅", title:"Réveil", desc:"Première envie."})}
+          ${cOpt({key:"moments", value:"party", icon:"🍺", title:"Soirée", desc:"Contexte social."})}
+          ${cOpt({key:"moments", value:"tv", icon:"📺", title:"Télé / détente", desc:"Automatisme."})}
+        </div>
+
+        <div style="height:14px"></div>
+        <div class="q">Occasions particulières <small>0 à 3</small></div>
+        <div class="options">
+          ${cOpt({key:"occasions", value:"alcool", icon:"🍻", title:"Alcool / soirée", desc:"Moments à risque."})}
+          ${cOpt({key:"occasions", value:"social", icon:"👥", title:"Avec des gens", desc:"Cigarette sociale."})}
+          ${cOpt({key:"occasions", value:"work", icon:"💼", title:"Au travail", desc:"Rythme des pauses."})}
+          ${cOpt({key:"occasions", value:"anxiety", icon:"😟", title:"Anxiété / tension", desc:"Gestion émotionnelle."})}
+          ${cOpt({key:"occasions", value:"boredom", icon:"😐", title:"Ennui / automatisme", desc:"Gestuelle."})}
+          ${cOpt({key:"occasions", value:"driving", icon:"🛣️", title:"Conduite", desc:"Routines voiture."})}
+          <div style="opacity:.0;pointer-events:none"></div>
+          <div style="opacity:.0;pointer-events:none"></div>
+        </div>
+
+        ${clientNav()}
+      `);
+    }
+
+    if(client.step === 4){
+      clientMount(header("Étape 4 — Votre objectif", "Choisir 1 option.") + `
+        <div class="options">
+          ${cOpt({key:"goal", value:"stop_now", icon:"🚫", title:"Arrêter complètement", desc:"Objectif : continuité sans frustration."})}
+          ${cOpt({key:"goal", value:"transition", icon:"🔄", title:"Transition progressive", desc:"On avance étape par étape."})}
+          ${cOpt({key:"goal", value:"reduce", icon:"➖", title:"Réduire d’abord", desc:"On sécurise puis on descend."})}
+          <div style="opacity:.0;pointer-events:none"></div>
+        </div>
+
+        ${clientNav()}
+      `);
+    }
+
+    if(client.step === 5){
+      const momentsTxt = client.moments.length ? client.moments.map(x=>L.habits[x]).join(" • ") : "—";
+      const occTxt = client.occasions.length ? client.occasions.map(x=>CL.occasions[x]).join(" • ") : "—";
+
+      clientMount(header("Terminé ✅", "Remettez la tablette au vendeur.") + `
+        <div class="result">
+          <div class="badges">
+            <span class="b info">${client.cigsPerDay ? CL.cigsPerDay[client.cigsPerDay] : "—"}</span>
+            <span class="b info">${client.cigType ? CL.cigType[client.cigType] : "—"}</span>
+            <span class="b info">${client.goal ? CL.goal[client.goal] : "—"}</span>
+          </div>
+
+          <div class="sectionTitle">Résumé client</div>
+          <ul class="list">
+            <li class="li"><div class="ic">🕒</div><div class="tx"><strong>Moments clés :</strong> ${momentsTxt}</div></li>
+            <li class="li"><div class="ic">⭐</div><div class="tx"><strong>Occasions :</strong> ${occTxt}</div></li>
+          </ul>
+
+          <div class="sectionTitle">Vendeur</div>
+          <div style="color:var(--muted);font-size:13px;line-height:1.45">
+            Cliquez sur <strong>Préconisation</strong> pour afficher directement ce que vous devez proposer
+            (matériel + taux de nicotine) en utilisant la logique STOOM déjà intégrée.
+          </div>
+
+          <div class="tools">
+            <button class="btn primary" id="vendorRecoBtn" type="button">Préconisation (vendeur)</button>
+            <button class="btn ghost" id="clientRestartBtn" type="button">Recommencer</button>
+          </div>
+        </div>
+
+        ${clientNav()}
+      `);
+    }
+
+    clientRoot.querySelectorAll("button[disabled]").forEach(b=>{ b.style.opacity=.55; b.style.cursor="not-allowed"; });
+  }
+
+  // =========================
+  // Boot + wrapper showPage
+  // =========================
+  // Render tools when entering pages
   const _showPage = showPage;
   showPage = function(name){
     _showPage(name);
     if(name === "material") renderTool();
     if(name === "sav") savRender();
+    if(name === "client") clientRender();
   };
+
+  showPage("home");
 </script>
 </body>
 </html>
