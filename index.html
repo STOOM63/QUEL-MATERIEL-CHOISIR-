@@ -815,7 +815,7 @@ Check-list : remplissage/recharge/changement résistance + plan d’ajustement +
   function chargeEquivalence(perYear){
     if(perYear < 1500) return "≈ 10 à 15 mois d’électricité";
     if(perYear < 2500) return "≈ 2 ans d’électricité";
-    if(perYear < 3500) return "≈ 3 année d’électricité";
+    if(perYear < 3500) return "≈ 3 ans d’électricité";
     if(perYear < 4500) return "≈ 5 à 6 mois de loyer";
     if(perYear < 6000) return "≈ 3 à 5 années de carburant";
     return "≈ 1 année de charges courantes (énergie + carburant)";
@@ -927,7 +927,7 @@ Check-list : remplissage/recharge/changement résistance + plan d’ajustement +
     if(h.has("coffee")) tips.push("Café : vapoter 1–2 minutes avant. Objectif : anticiper l’envie et stabiliser la sensation.");
     if(h.has("aftermeal")) tips.push("Après repas : rester sur une vape confortable 2–3 minutes. La régularité suffit.");
     if(h.has("stress")) tips.push("Stress : rapprocher les bouffées. Si nécessaire, ajuster la nicotine plutôt que la puissance.");
-    if(h.has("car")) tips.push("Voiture : privilégier un matériel discret, tirage plutôt serré et airflow stable et facilement remplissable.");
+    if(h.has("car")) tips.push("Voiture : privilégier un matériel discret, tirage plutôt serré, airflow stable et remplissage simple.");
     if(h.has("breaks")) tips.push("Pauses courtes : tirage serré + dosage confortable + autonomie sécurisante.");
     if(h.has("morning")) tips.push("Réveil : éviter le sous-dosage. Mieux vaut un dosage confortable qu’une montée en puissance.");
     if(h.has("party")) tips.push("Soirée : conserver des réglages stables et un matériel simple.");
@@ -938,8 +938,8 @@ Check-list : remplissage/recharge/changement résistance + plan d’ajustement +
     if(state.style === "variable") tips.push("Profil variable : privilégier un set-up polyvalent et stable, puis ajuster progressivement.");
 
     if(state.priority === "hit") tips.push("Hit : travailler via tirage + dosage, pas en augmentant la puissance.");
-    if(state.priority === "gout") tips.push("Goût : puissance modérée et matériel stable = saveurs plus intenses.");
-    if(state.priority === "autonomie") tips.push("Autonomie : sécuriser la journée évite la panne (et la frustration), prevoir 1/2 accus supplementaires.");
+    if(state.priority === "gout") tips.push("Goût : puissance modérée et matériel stable = saveurs plus nettes.");
+    if(state.priority === "autonomie") tips.push("Autonomie : sécuriser la journée évite la panne (et la frustration). Prévoir accus/charge adaptés si besoin.");
 
     return [...new Set(tips)].slice(0,6);
   }
@@ -1304,14 +1304,12 @@ Points de vigilance :
   }
 
   function savEngine(){
-    // The idea: prioritize the most common, simplest fix first.
+    // Prioriser les actions les plus simples / fréquentes en premier
     const plan = [];
     const avoid = [];
     const badges = [];
 
-    const changedCoil = (sav.change === "coil");
     const changedLiquid = (sav.change === "liquid");
-    const changedSettings = (sav.change === "settings");
 
     const addPlan = (t) => plan.push(t);
     const addAvoid = (t) => avoid.push(t);
@@ -1325,9 +1323,9 @@ Points de vigilance :
         badges.push({t:"Fuite", c:"warn"});
         addPlan("Fuite : vérifier fermeture, joints, et absence de condensation dans l’airflow.");
         addPlan("Fuite : vérifier résistance/cartouche (usure, mauvaise insertion). Remplacer si doute.");
-        addPlan("Fuite : éviter remplissage excessif et laisser 5 minutes après remplissage.");
-        addPlan("Fuite : Vérifier que la viscosité du liquide utilisé (PG/VG) corresponde bien au matériel.");
-        addPlan("Fuite : Même en l'absence de goût de brulé, la resistance doit étre changée toute les 4 semaines MAX !);
+        addPlan("Fuite : éviter le remplissage excessif et laisser 5 minutes après remplissage.");
+        addPlan("Fuite : vérifier que la viscosité du liquide (PG/VG) corresponde bien au matériel.");
+        addPlan("Fuite : même sans goût de brûlé, changer la résistance au plus tard toutes les 3–4 semaines (usage régulier).");
         addAvoid("Airflow très ouvert avec liquide très fluide (risque de glouglou).");
       }
 
@@ -1351,7 +1349,7 @@ Points de vigilance :
         badges.push({t:"Irritation", c:"warn"});
         addPlan("Irritation : vérifier nicotine (trop forte) OU puissance (trop élevée) → ajuster pour retrouver le confort.");
         addPlan("Irritation : vérifier type d’inhalation (bouffées plus douces au début).");
-        addPlan("Irritation : vérifier hydratation et éviter enchaînement trop rapide.");
+        addPlan("Irritation : vérifier hydratation et éviter l’enchaînement trop rapide.");
         addAvoid("Tirage très aérien avec dosage élevé (souvent inconfortable).");
       }
 
@@ -1371,8 +1369,8 @@ Points de vigilance :
 
       if(p === "nodraw"){
         badges.push({t:"Ne déclenche pas", c:"bad"});
-        addPlan("Ne déclenche pas : vérifier charge batterie, contact 510 / contacts cartouche, et présence de liquide.");
-        addPlan("Ne déclenche pas : vérifier si résistance est bien reconnue (remettre / remplacer).");
+        addPlan("Ne déclenche pas : vérifier charge batterie, contacts (cartouche/510), et présence de liquide.");
+        addPlan("Ne déclenche pas : vérifier si la résistance est bien reconnue (remettre / remplacer).");
         addPlan("Ne déclenche pas : si dispositif auto-draw : vérifier condensation dans l’embout (nettoyer).");
         addAvoid("Forcer si odeur de chaud ou message d’erreur répété (sécuriser).");
       }
@@ -1404,7 +1402,8 @@ Points de vigilance :
 
     // Deduplicate
     const uniq = (arr) => [...new Set(arr)];
-    return { badges: uniq(badges.map(b=>JSON.stringify(b))).map(s=>JSON.parse(s)), plan: uniq(plan), avoid: uniq(avoid) };
+    const uniqBadges = uniq(badges.map(b=>JSON.stringify(b))).map(s=>JSON.parse(s));
+    return { badges: uniqBadges, plan: uniq(plan), avoid: uniq(avoid) };
   }
 
   function savShowResult(){
