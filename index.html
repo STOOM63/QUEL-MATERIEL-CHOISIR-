@@ -1672,11 +1672,18 @@ Conseil : si le confort n’est pas retrouvé rapidement, revenir en boutique po
   }
 
   function clientAutoAdvance(){
-    if(client.step === 1 && clientStepOk(1)){ client.step = 2; clientRender(); return; }
-    if(client.step === 2 && clientStepOk(2)){ client.step = 3; clientRender(); return; }
-    if(client.step === 3 && clientStepOk(3)){ client.step = 4; clientRender(); return; }
-    if(client.step === 4 && clientStepOk(4)){ client.step = 5; clientRender(); return; }
-  }
+  // Auto-advance OK pour les étapes simples (1 et 2)
+  if(client.step === 1 && clientStepOk(1)){ client.step = 2; clientRender(); return; }
+  if(client.step === 2 && clientStepOk(2)){ client.step = 3; clientRender(); return; }
+
+  // IMPORTANT :
+  // Étape 3 = moments + occasions -> on NE passe PAS automatiquement à l’étape 4
+  // Le client doit cliquer sur "Continuer" quand il a fini.
+
+  // Auto-advance OK après l’étape 4
+  if(client.step === 4 && clientStepOk(4)){ client.step = 5; clientRender(); return; }
+}
+
 
   function clientReset(){
     client.step = 1;
